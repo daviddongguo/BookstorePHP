@@ -28,11 +28,9 @@ DB::$error_handler = 'db_error_handler';
  // </editor-fold>
 
 
-
-
-
-// <editor-fold defaultstate="collapsed" desc="user-description">
-function db_error_handler($params) {
+// <editor-fold defaultstate="collapsed" desc="Configure Error-Handler">
+function db_error_handler($params) 
+{
     global $app, $log;
     $log->error("SQL error: " . $params['error']);
     $log->error("SQL query: " . $params['query']);
@@ -43,15 +41,7 @@ function db_error_handler($params) {
 // </editor-fold>
 
 
-
-
-
-
-// </editor-fold>
-
-
-// <editor-fold defaultstate="collapsed" desc="user-description">
-// Slim creation and setup
+// <editor-fold defaultstate="collapsed" desc="Slim creation and setup">
 $app = new \Slim\Slim(array(
     'view' => new \Slim\Views\Twig()
         ));
@@ -66,15 +56,17 @@ $view->setTemplatesDirectory(dirname(__FILE__) . '/templates');
 
 
 
-// <editor-fold defaultstate="collapsed" desc="user-description">
-//Run Index Page
+// <editor-fold defaultstate="collapsed" desc="Run Index Page">
 $app->get('/', function() use ($app) 
 {
+    $sessionID = 
+    
+    
     //Get all todos from DB
-    $todoList = DB::query("SELECT * FROM todos");
+    $books = DB::query("SELECT * FROM products");
     
     //Pass todos to index HTML as array of todos
-    $app->render('index.html.twig', array('todoList' => $todoList));
+    $app->render('index.html.twig', array('books' => $books));
 });
 // </editor-fold>
 
@@ -107,7 +99,15 @@ $app->get('/', function() use ($app)
 
 // </editor-fold>
 
-// <editor-fold defaultstate="collapsed" desc="user-description">
+
+
+
+
+
+
+
+
+// <editor-fold defaultstate="collapsed" desc="Research Notes">
 
         
 //BOOTSTRAP - Basic Navbar (Top)
@@ -147,4 +147,9 @@ $app->get('/', function() use ($app)
 //https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_topnav
 // </editor-fold>
 
-?>
+
+
+
+
+$app->run();
+

@@ -1,1 +1,20 @@
-{# empty Twig template #}
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/styles.css" />
+        <title>{% block title %}{% endblock %} - libEr</title>
+        {% block addhead %}{% endblock %}
+    </head>
+    
+    
+    <body>
+        
+        <div id="centeredContent">{% block content %}{% endblock %}
+            
+            
+            <div id="footer">&copy; Copyright 2019 by <a href="http://localhost:8099/">libEr</a>.</div>
+            
+            
+        </div>
+    </body>
+</html>
