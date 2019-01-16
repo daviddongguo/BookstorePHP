@@ -56,17 +56,16 @@ $view->setTemplatesDirectory(dirname(__FILE__) . '/templates');
 
 
 
-// <editor-fold defaultstate="collapsed" desc="Run Index Page">
-$app->get('/', function() use ($app) 
+// <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
+$app->get('/', function() use ($app, $log) 
 {
-    $sessionID = 
-    
-    
+    $sessionID = session_id();
+       
     //Get all todos from DB
     $books = DB::query("SELECT * FROM products");
     
     //Pass todos to index HTML as array of todos
-    $app->render('index.html.twig', array('books' => $books));
+    $app->render('index.html.twig', $sessionID, array('books' => $books));
 });
 // </editor-fold>
 

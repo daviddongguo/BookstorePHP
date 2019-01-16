@@ -1,0 +1,28 @@
+{% extends "master.html.twig" %}
+
+
+
+
+
+{% block title %}
+    libEr
+{% endblock %}
+
+
+
+
+
+
+{% block content %}
+    
+<div>
+    {% for book in books %}
+        <div>
+            <br><b>{{book.title}}</b></br>
+            <br>{{todo.author}}<br>
+            <br>{{todo.ISBN}}<br>            
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}
