@@ -16,11 +16,13 @@
 {% block content %}
     
 <div>
+    <h2>Welcome, your sessionID is {{sessionID}}</h2>
     {% for book in books %}
         <div>
             <br><b>{{book.title}}</b></br>
-            <br>{{todo.author}}<br>
-            <br>{{todo.ISBN}}<br>            
+            <br>{{book.author}}<br>            
+            <br>{{book.price}}<br>       
+            <br>{{book.ISBN}}<br>            
         </div>
     {% endfor %}
 </div>
