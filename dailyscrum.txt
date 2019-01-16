@@ -13,7 +13,39 @@ DAILY SCRUM - EVERY DAY AT 9AM
 - to discuss and confirm the above topics
 
 
-x
+2019/01/16 Scott
+1. Done since the last scrum:
+- Selected Project
+- Drafted Proposal with DB and Layout
+- Synched with Project Trello
+2. To do until next Scrum:
+- Setup Xampp config
+- Port htSccess 
+- Port libraries
+- Create Cache, Templates, Log folders
+3. Need assistance/figure things out
+- PHP-Spider
+- Bootstrap
+- Meekro CRUD
+- DB File Upload
+
+==============================2019/01/15 Scott  ========================================
+
+2019/01/15 Scott
+1. Done since the last scrum:
+- 0-Day
+2. To do until next Scrum:
+- Select Project 
+- Write Proposal
+- Layout Databases
+- Create Html Mockups
+3. Need assistance/figure things out
+- PHP-Spider
+- Bootstrap
+- Meekro CRUD
+- DB File Upload
+
+
 
 
 =========================================================================================
