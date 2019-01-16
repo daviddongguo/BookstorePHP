@@ -1,13 +1,16 @@
 DAILY SCRUM - EVERY DAY AT 9AM
 ==============================
 
+==============================2019/01/16 Dongguo========================================
 2019/01/16 Dongguo
-1. Done since last scrum:
-- 
+1. Done since the last scrum:
+- created a project plan
+- created Mockups of pages
 2. To do until next Scrum:
-- 
-3. Need assistance / figure things out
-- 
+- setup the database
+- setup the Master template
+3. Need assistance/figure things out
+- to discuss and confirm the above topics
 
 
 
@@ -45,13 +48,3 @@ Example entries for one day, both team members:
 3. Need assistance / figure things out
 - find and test a library for PDF printouts
 - find out how to fetch data from URL and parse JSON
-
-2018/02/28 Jerry
-1. Done since last srum
-- lkjsadf
-- asldkfj
-2. Plan until next Scrum
-- lkjasdf
-- asfdasfd
-3. Need assistance / figure things out
-- laksdjfl
