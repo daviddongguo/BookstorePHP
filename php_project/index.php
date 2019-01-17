@@ -65,6 +65,18 @@ $app->get('/', function() use ($app, $log) {
         'books' => $books));
 });
 // </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="Run addedit item Page (GET POST)">
+$app->get('/add', function() use ($app, $log) {
+    //Pass todos to index HTML as array of todos
+    $errorList = array();
+    $item = array();
+    $app->render('addedititem.html.twig', array(
+        'errorList' => $errorList,
+        'v' => $item));
+});
+$app->post('/add', function() use ($app, $log) {
+    var_dump($_POST);
+});
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
