@@ -17,7 +17,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 DB::$user = 'bootstore';
 DB::$dbName = 'bootstore';
 DB::$password = 'vuxunjqTbm5S7sAq';
-DB::$port = 3333;
+DB::$port = 3306;
 DB::$host = 'localhost';
 DB::$encoding = 'utf8';
 DB::$error_handler = 'db_error_handler';
@@ -46,25 +46,22 @@ $view->parserOptions = array(
 );
 $view->setTemplatesDirectory(dirname(__FILE__) . '/templates');
 // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
-$app->get('/', function() use ($app, $log) {
-    $sessionID = session_id();
 
-    //Get all todos from DB
-    $books = DB::query("SELECT * FROM items");
-
-    // -----------------debugging --------------------
-    var_dump($sessionID); // debugging
-    echo '<hr />';
-    var_dump($books);
-    echo '<hr />';
-    // -----------------debugging --------------------
+// <editor-fold defaultstate="collapsed" desc="Run addedit item Page (GET POST)">
+$app->get('/add', function() use ($app, $log) {
     //Pass todos to index HTML as array of todos
-    $app->render('index.html.twig', array(
-        'sessionID' => $sessionID, 
-        'books' => $books));
+    $errorList = array();
+    $item = array();
+    $app->render('addedititem.html.twig', array(
+        'errorList' => $errorList,
+        'v' => $item));
+});
+$app->post('/add', function() use ($app, $log) {
+    var_dump($_POST);
 });
 // </editor-fold>
+// 
+// 
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
