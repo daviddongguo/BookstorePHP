@@ -1,0 +1,149 @@
+{% extends "master.html.twig" %}
+
+{% block title %}
+    {% if action == 'edit' %}
+        Editing book
+    {% else %}
+        Adding book
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    {% if errorList %}    
+        <ul class="error">
+            {% for error in errorList %}
+                <li>{{error}}</li>
+                {% endfor %}
+        </ul>
+    {% endif %}
+
+
+
+
+    {#    <form method="post">
+            Task: <input type="text" name="task" value="{{v.task}}" ><br>
+            Due date: <input type="date" name="dueDate" value="{{v.dueDate}}"><br>
+            Is done: <input type="checkbox" name="isDone" value="true"
+                            {% if v.isDone == 'true' %}checked{% endif %}><br>
+            <input type="hidden"  name="id" value="{{v.id}}"><br>
+            <input type="submit" value="{% if action == 'edit'
+                   %}Save todo{% else %}Add todo{% endif %}">
+        </form>#}
+
+
+    <form method="post">
+        <div class="form-group row">
+            <label for="staticId" class="col-sm-2 col-form-label">Id</label>
+            <div class="col-sm-10">
+                <input type="text" readonly class="form-control-plaintext" 
+                       name="id" value="{{ v.id }}"
+                       id="staticId"">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputTitle" class="col-sm-2 col-form-label">Title</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="inputTitle"                        
+                       name="title" value="{{ v.title }}"
+                       placeholder="Title">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputAuthor" class="col-sm-2 col-form-label">Author</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="inputAuthor"                      
+                       name="author" value="{{ v.author }}"
+                       placeholder="Author">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputPrice" class="col-sm-2 col-form-label">Price</label>
+            <div class="col-sm-10">
+                <input type="number" class="form-control"                      
+                       name="price" value="{{ v.price }}"
+                       id="inputPrice" placeholder="Price">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="conditionformControlRange"><p id="conditionLable" >Condition: <span id="valBox"></span> %</p></label>
+            <input type="range" name=condition  class="custom-range" 
+                   value= {{ v.conditionofused }} 
+                   ooninput="showVal(this.value)" onchange="showVal(this.value)"
+                   min="0" max="100" step="10"  id="conditionformControlRange">
+        </div>
+
+        <fieldset class="form-group">
+            <div class="row">
+                <legend class="col-form-label col-sm-2 pt-0">Typess</legend>
+                <div class="col-sm-10">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type1" id="gridRadios1" value="option1" checked>
+                        <label class="form-check-label" for="gridRadios1">
+                            First Type
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type2" id="gridRadios2" value="option2">
+                        <label class="form-check-label" for="gridRadios2">
+                            Second Type
+                        </label>
+                    </div>
+                    <div class="form-check disabled">
+                        <input class="form-check-input" type="radio" name="type3" id="gridRadios3" value="option3" disabled>
+                        <label class="form-check-label" for="gridRadios3">
+                            Third disabled Type
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="form-group row">
+            <div class="col-sm-2">Genre</div>
+            <div class="col-sm-10">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="genre" id="gridCheck1">
+                    <label class="form-check-label" for="gridCheck1">
+                        Genre
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="imageFormControlFile">Image</label>
+            <input type="file" name="image" onchange="loadFile(event)" 
+                   class="form-control-file" id="imageFormControlFile">
+            <img class="rounded float-left"                  
+                 id="preview" alt="The preview of an image of this book.">
+        </div>
+        <div class="form-group">
+            <label for="descriptionTextarea1">Description</label>
+            <textarea class="form-control" name="description" id="descriptionTextarea1" rows="3"></textarea>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary">
+                    {% if action == 'edit' %}
+                        Save Book
+                    {% else %}
+                        Add Book
+                    {% endif %} 
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block addfoot %}
+    <script>
+        var loadFile = function (event) {
+            var output = document.getElementById('preview');
+            output.src = URL.createObjectURL(event.target.files[0]);
+        };
+
+        function showVal(newVal) {
+            document.getElementById("valBox").innerHTML=newVal;
+        }
+
+    </script>
+{% endblock %}
