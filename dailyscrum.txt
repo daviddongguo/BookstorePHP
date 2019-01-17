@@ -22,6 +22,17 @@ DAILY SCRUM - EVERY DAY AT 9AM
 - DB File Upload
 - Setup Xampp COnfig (Directory Access Exception)
 
+2019/01/17 Dongguo
+1. Done since the last scrum:
+- Setup database
+- connect databae
+2. To do until next Scrum:
+-  Add a table (classes) in the database to include all the book types
+- Setup the page for add book
+- Setup the function to add book to database
+3. Need assistance/figure things out
+- DB File Upload
+
 
 
 
