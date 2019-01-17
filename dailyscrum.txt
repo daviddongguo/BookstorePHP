@@ -1,6 +1,30 @@
 DAILY SCRUM - EVERY DAY AT 9AM
 ==============================
 
+
+
+==============================2019/01/17 Scott  ========================================
+
+2019/01/17 Scott
+1. Done since the last scrum:
+- Setup Xampp config
+- Port htaccess 
+- Port libraries
+- Create Cache, Templates, Log folders 
+2. To do until next Scrum:
+- Build Html modules for testing (item & index)
+- Import Database
+- Write Queries and CRUD 
+- PHP for urls'
+3. Need assistance/figure things out
+- PHP-Spider
+- Meekro CRUD
+- DB File Upload
+- Setup Xampp COnfig (Directory Access Exception)
+
+
+
+
 ==============================2019/01/16 Dongguo========================================
 2019/01/16 Dongguo
 1. Done since the last scrum:
@@ -20,7 +44,7 @@ DAILY SCRUM - EVERY DAY AT 9AM
 - Synched with Project Trello
 2. To do until next Scrum:
 - Setup Xampp config
-- Port htSccess 
+- Port htaccess 
 - Port libraries
 - Create Cache, Templates, Log folders
 3. Need assistance/figure things out
