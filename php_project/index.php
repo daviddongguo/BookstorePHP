@@ -16,7 +16,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
 DB::debugMode();
 
-if (false) {
+if (true) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
