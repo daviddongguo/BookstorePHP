@@ -13,7 +13,8 @@ Build Html modules for testing (item & index)
 - PHP for urls'
 - Update Trello
 - Get sample images for books 
-- Login  
+- Login Form
+- Login Headers (You are logged out/You are logged in)
 - Navigation (Logged Out)
 - Navigation (Logged In) 
 - Add Navigation to master
@@ -21,7 +22,7 @@ Build Html modules for testing (item & index)
 - Write MeekroDB SQL Operations (Also mark in Trello)
 	- Insert new item
 	- Add User
-	- Query for for Registered User Id
+	- Query for Registered User Id
 	- Query for Email
 	- Query All
 	- Query Type1
@@ -29,13 +30,13 @@ Build Html modules for testing (item & index)
 	- Query Type3
 	- Query By Price	
 	- Order by Author
-	- Query Disctinct ISBN's
+	- Query Distinct ISBN's
 	- Query Users transaction history
 	- Query Users Sale History
 	- Query Users Cart (SessionId)
 	- Query Users Cart (UserId)
 	- Add Item to Cart
-	- Remove Irem from Cart
+	- Remove item from Cart
 	- Remove item
 	- Transaction (INSERT items in Cart to History, Remove items from Items, Delete items in Cart)
 - Write PHP paths/routes

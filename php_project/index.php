@@ -193,7 +193,250 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="user-description">
+// <editor-fold defaultstate="collapsed" desc="MeekroDB Actions">
+    
+    /*
+    //INSERT new item
+            DB::insert('items', array(
+                'ISBN' => $ISBN,
+                //Other stuff
+                'imagePath' => $image['name']
+            ));
+                            
+            //
+            $log->debug("Adding with new Id = " . DB::insertId());
+            
+            $itemId = DB::insertId();
+            $app->render('item_add_success.html.twig', array('productId' => $productId));
+
+
+            
+            
+            
+            
+    //INSERT new User
+            DB::insert('items', array(
+                'email' => $email,
+                //Other Stuff
+                'password' => $password
+            ));
+                            
+            //$log->debug("Adding with new Id = " . DB::insertId());
+            
+            $UserId = DB::insertId();
+            $_SESSION['userId'] = $userID;
+            $app->render('index.html.twig', $_SESSION['userId']);
+
+
+
+            
+            
+    //Query for Registered User 
+            //
+            //  NOT WORKING YET
+            //
+            $userEmail = $app->request()->post('userEmail');
+            
+            
+            $userProfile = DB::queryFirstRow("SELECT * FROM users WHERE id=%i", $userId);
+            
+            if (!$userProfile) 
+            {
+                $app->notFound();
+                return;
+            }
+                $app->render('product_view.html.twig', array('p' => $product));
+            });
+            
+            
+
+
+
+
+            
+            
+    //Query All
+            
+            
+            //Index's Sidebar is comprised of text links                    
+                //<a href = index/~~~~/~~~~>~~~~~~~</a> 
+            
+            
+            
+            //case('all') //TAKEN FROM URL TOKEN
+            $items = DB::query("SELECT * FROM items");
+            $app->render('index.html.twig', array('items' => $items));
+            
+            
+
+    //Query Type1, type2, type3
+            
+            //case('type1')     //TAKEN FROM URL TOKEN
+            //$type1            //TAKEN FROM URL TOKEN 
+            
+            $items = DB::query("SELECT * FROM items WHERE type1=%s", $type1);
+            $app->render('index.html.twig', array('items' => $items));
+            
+            
+
+            
+    //Query By Price
+            
+            //case('highprice')     //TAKEN FROM URL TOKEN
+            //$price                //TAKEN FROM URL TOKEN 
+            
+            $items = DB::query("SELECT * FROM items WHERE price>%d", $price);
+            $app->render('index.html.twig', array('items' => $items));
+            
+            
+            
+    //Order by Author 
+    
+            
+            //Add the same functionality as the sidebar 
+            //links to the author line of the main
+            
+            
+            
+            //case('author')     //TAKEN FROM URL TOKEN
+            //$author            //TAKEN FROM URL TOKEN 
+            
+            $items = DB::query("SELECT * FROM items WHERE author=%s", $author);
+            $app->render('index.html.twig', array('items' => $items));
+            
+      
+            
+            
+    //Query Disctinct ISBN's
+            
+            //case('ISDN')     //TAKEN FROM URL TOKEN
+            
+            $items = DB::query("SELECT DISTINCT ISBN FROM items");
+            $app->render('index.html.twig', array('items' => $items));
+            
+          
+            
+            
+            
+    //Query Users transaction history
+            
+            $userID = $_SESSION['userId'];
+            
+            $items = DB::query(""
+                    . "SELECT * "
+                    . "FROM orderitems "
+                    . "INNER JOIN orders "
+                    . "ON orderitems.orderId=orders.id "
+                    . "WHERE orders.userId=%s", $userID
+                    );
+            
+           
+            //If we add a timestamp to the orders we can return the 
+            //transacrion history in chroniclogical order with
+           
+                //"ORDER BY orders.timestamp ASC"
+            
+           
+            
+            $app->render('transactionhistory.html.twig', array('items' => $items));
+
+         
+
+    //Query Users Sale History
+         
+            $userID = $_SESSION['userId'];   
+            
+            $items = DB::query("SELECT * FROM items WHERE sellerId=%s", $userID);
+            $app->render('sellhistory.html.twig', array('items' => $items));
+
+            
+
+            
+    //Query Users Cart (SessionId)
+            
+            
+            $sessionId = session_id();
+            
+            $items = DB::query(""
+                    . "SELECT * "
+                    . "FROM cartitems "
+                    . "INNER JOIN items "
+                    . "ON cartitems.itemId=items.id "
+                    . "WHERE cartitems.sessionId=%s "
+                    . "ORDER BY cartitems.createdTS ASC", $userID
+                    );       
+            
+            $app->render('cart.html.twig', array('items' => $items));
+       
+
+
+
+
+    //Query Users Cart (UserId)
+                        
+            $userID = $_SESSION['userId'];
+            
+            $items = DB::query(""
+                    . "SELECT * "
+                    . "FROM cartitems "
+                    . "INNER JOIN items "
+                    . "ON cartitems.itemId=items.id "
+                    . "WHERE cartitems.userId=%s "
+                    . "ORDER BY cartitems.createdTS ASC", $userID
+                    );       
+            
+            $app->render('cart.html.twig', array('items' => $items));
+       
+       
+
+
+
+
+          
+    //Add Item to Cart
+            
+       
+
+
+
+          
+    //Remove Item from Cart
+            
+       
+
+
+
+
+
+          
+    //Remove item
+            
+            
+      
+
+
+
+
+    //Transaction (INSERT items in Cart to History, Remove items from Items, Delete items in Cart)
+            
+            
+          
+
+
+    */      
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Research Notes">
 //BOOTSTRAP - Basic Navbar (Top)
