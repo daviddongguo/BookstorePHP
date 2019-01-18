@@ -80,13 +80,14 @@ $app->get('/', function() use ($app, $log) {
 // <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
 $app->get('/admin/item/add', function() use ($app, $log) {
     // fetch the first step of book classification
-    $classes = DB::query("SELECT * FROM classes WHERE code LIKE '%00'");
-    // stage 1 get form
-    $app->render('item_addedit.html.twig', array(
-        'Classification' => array(
-            '0' => $classes
-        )
-    ));
+//    $classes = DB::query("SELECT * FROM classes WHERE code LIKE '%00'");
+//    // stage 1 get form
+//    $app->render('item_addedit.html.twig', array(
+//        'Classification' => array(
+//            '0' => $classes
+//        )
+//    ));
+    $app->render('item_addedit.html.twig');
 });
 $app->post('/admin/item/add', function() use ($app, $log) {
     // -----------------debugging --------------------
