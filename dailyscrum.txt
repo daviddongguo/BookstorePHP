@@ -1,9 +1,25 @@
 DAILY SCRUM - EVERY DAY AT 9AM
 ==============================
 
+==============================2019/01/18   ========================================
+
+Scott
 
 
-==============================2019/01/17 Scott  ========================================
+Dongguo
+1. Done since the last scrum:
+- add table named classes in database.
+- update the table items and users. 
+- finish the function to add one book into database including image.
+2. To do until next Scrum:
+- update the function adding book
+- Setup the page for list book 
+- Setup the page for show the detail of a book
+3. Need assistance/figure things out
+- fetch the data from table(classes) by using Ajax technology
+
+
+==============================2019/01/17  ========================================
 
 2019/01/17 Scott
 1. Done since the last scrum:
@@ -36,7 +52,7 @@ DAILY SCRUM - EVERY DAY AT 9AM
 
 
 
-==============================2019/01/16 Dongguo========================================
+==============================2019/01/16 ========================================
 2019/01/16 Dongguo
 1. Done since the last scrum:
 - created a project plan
@@ -64,7 +80,7 @@ DAILY SCRUM - EVERY DAY AT 9AM
 - Meekro CRUD
 - DB File Upload
 
-==============================2019/01/15 Scott  ========================================
+==============================2019/01/15 ========================================
 
 2019/01/15 Scott
 1. Done since the last scrum:
