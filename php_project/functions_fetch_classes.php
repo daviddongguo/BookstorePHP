@@ -2,6 +2,28 @@
 
 header('Content-Type: application/json');
 
+require_once 'vendor/autoload.php';
+
+DB::debugMode();
+
+if (true) {
+    DB::$user = 'bootstore';
+    DB::$dbName = 'bootstore';
+    DB::$password = 'vuxunjqTbm5S7sAq';
+    DB::$port = 3333;
+    DB::$host = 'localhost';
+    DB::$encoding = 'utf8';
+    DB::$error_handler = 'db_error_handler';
+} else {
+    DB::$user = 'bootstore';
+    DB::$dbName = 'bootstore';
+    DB::$password = 'vuxunjqTbm5S7sAq';
+    DB::$port = 3306;
+    DB::$host = 'localhost';
+    DB::$encoding = 'utf8';
+    DB::$error_handler = 'db_error_handler';
+}
+
 $aResult = array();
 
 if (!isset($_POST['functionname'])) {
@@ -19,13 +41,17 @@ if (!isset($aResult['error'])) {
             if (!is_array($_POST['arguments']) || (count($_POST['arguments']) < 2)) {
                 $aResult['error'] = 'Error in arguments!';
             } else {
-                $aResult['result'] = substr($_POST['arguments'][0], 1);
-//                   $aResult['result'] = $_POST['arguments'][0]), floatval($_POST['arguments'][1]));
-                if (substr($_POST['arguments'][0], 1) == '00') {
-                    $a = substr($_POST['arguments'][0], 0, 1);
-                    $codeLike = $a . '%%';
-                    $aResult['result'] = $codeLike;
-                }
+//                $aResult['result'] = substr($_POST['arguments'][0], 0, 1);
+
+                $codelikeStr = substr($_POST['arguments'][0], 0, 1) . '%0';
+                $querStr = "SELECT code, name FROM classes WHERE code LIKE '$codelikeStr' ORDER BY code";
+                $results = DB::query($querStr);
+                
+//                $aResult['result'] = $querStr;
+                $aResult = array(
+                    'result' => $results
+                );
+                        
             }
             break;
 

@@ -66,10 +66,10 @@ $app->get('/', function() use ($app, $log) {
     $books = DB::query("SELECT * FROM items");
 
     // -----------------debugging --------------------
-    var_dump($sessionID); // debugging
-    echo '<hr />';
-    var_dump($books);
-    echo '<hr />';
+//    var_dump($sessionID); // debugging
+//    echo '<hr />';
+//    var_dump($books);
+//    echo '<hr />';
     // -----------------debugging --------------------
     //Pass todos to index HTML as array of todos
     $app->render('index.html.twig', array(
@@ -84,7 +84,7 @@ $app->get('/admin/item/add', function() use ($app, $log) {
     // stage 1 get form
     $app->render('item_addedit.html.twig', array(
         'Classification' => array(
-            '1' => $classes
+            '0' => $classes
         )
     ));
 });
@@ -158,6 +158,35 @@ $app->get('/item/:id/image', function($id) use ($app, $log) {
     }
     $app->response()->header('content-type', $item['mimeType']);
     echo $item['image'];
+});
+
+// <editor-fold defaultstate="collapsed" desc="Run /item/:code/class (GET)">
+$app->get('/item/:code/class', function($code) use ($app, $log) {
+
+    switch (strlen($code)) {
+        case 1:
+            $codelikeStr = $code . '%0';
+            $querStr = "SELECT code, name FROM classes WHERE code LIKE '$codelikeStr' ORDER BY code";
+            $results = DB::query($querStr);
+            break;
+        case 2:
+            $codelikeStr = $code . '%';
+            $querStr = "SELECT code, name FROM classes WHERE code LIKE '$codelikeStr' ORDER BY code";
+            $results = DB::query($querStr);
+            break;
+        default:
+            $codelikeStr = '%00';
+            $querStr = "SELECT code, name FROM classes WHERE code LIKE '$codelikeStr' ORDER BY code";
+            $results = DB::query($querStr);
+            break;
+    }
+//    var_dump($results);
+    // <option value="{{ c.code }}">{{ c.name }}</option>
+
+    foreach ($results as $row) {
+        echo "<option value=" . $row['code'] . ">";
+        echo $row['name'] . "</option>\n";
+    }
 });
 
 // <editor-fold defaultstate="collapsed" desc="user-description">
