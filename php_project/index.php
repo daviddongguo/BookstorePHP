@@ -14,6 +14,8 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
+DB::debugMode();
+
 if (false) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
@@ -56,7 +58,6 @@ $view->parserOptions = array(
 );
 $view->setTemplatesDirectory(dirname(__FILE__) . '/templates');
 // </editor-fold>
-
 // <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
     $sessionID = session_id();
@@ -158,6 +159,7 @@ $app->get('/item/:id/image', function($id) use ($app, $log) {
     $app->response()->header('content-type', $item['mimeType']);
     echo $item['image'];
 });
+
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
