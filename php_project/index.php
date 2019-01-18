@@ -79,14 +79,7 @@ $app->get('/', function() use ($app, $log) {
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
 $app->get('/admin/item/add', function() use ($app, $log) {
-    // fetch the first step of book classification
-//    $classes = DB::query("SELECT * FROM classes WHERE code LIKE '%00'");
-//    // stage 1 get form
-//    $app->render('item_addedit.html.twig', array(
-//        'Classification' => array(
-//            '0' => $classes
-//        )
-//    ));
+    // stage 1 get form
     $app->render('item_addedit.html.twig');
 });
 $app->post('/admin/item/add', function() use ($app, $log) {
@@ -101,53 +94,83 @@ $app->post('/admin/item/add', function() use ($app, $log) {
     $id = $app->request()->post('id');
     $title = $app->request()->post('title');
     $author = $app->request()->post('author');
-    $price = $app->request()->post('price');
+    $isbn = $app->request()->post('isbn');
     $description = $app->request()->post('condition');
     $condition = $app->request()->post('condition');
+    $price = $app->request()->post('price');
+    $imageData = null;
+    $mimeType = null;
+    $valueList = array(
+        'id' => $id,
+        'title' => $title,
+        'author' => $author,
+        'isbn' => $isbn,
+        'description' => $description,
+        'condition' => $condition,
+        'price' => $price,
+        'image' => $imageData,
+        'mimeType' => $mimeType
+    );
 
-    $valueList = array('id' => $id, 'title' => $title, 'author' => $author, 'price' => $price, 'description' => $description, 'condition' => $condition);
     //
     $errorList = array();
     if (strlen($title) < 2 || strlen($title) > 200) {
-        array_push($errorList, "Number must be 8-12 characters long");
+        array_push($errorList, "Title($title) must be 2-200 characters long");
+    }
+    if ($author < 2 || $author > 100) {
+        array_push($errorList, "Author($author) must be 2-100 characters long");
+    }
+    if ($isbn < 2 || $isbn > 500) {
+        array_push($errorList, "ISBN($author) invalid");
+    }
+    if (strlen($description) < 20 || strlen($description) > 200) {
+        array_push($errorList, "Description must be 20-2000 characters long");
+    }
+    if ($condition < 40 || $condition > 100) {
+        array_push($errorList, "Condition must be 40-100");
+    }
+    if ($price < 0 || $price > 999.99) {
+        array_push($errorList, "Price($price) invalid");
     }
 
     // 
-    $image = $_FILES['image'];
-    $imageInfo = getimagesize($image['tmp_name']);
-    if (!$imageInfo) {
-        array_push($errorList, "File does not look like a valid image");
-    } else {
-        // never allow '..' in the file name
-        if (strstr($image['name'], '..')) {
-            array_push($errorList, "File name invalid");
-        }
-        // only allow select extensions
-        $ext = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
-        if (!in_array($ext, array('jpg', 'jpeg', 'gif', 'png'))) {
-            array_push($errorList, "File extension invalid");
-        }
-        // check mime-type submitted
-        //$mimeType = $image['type']; // TODO: use getimagesize result mime-type instead
-        $mimeType = $imageInfo['mime'];
-        if (!in_array($mimeType, array('image/gif', 'image/jpeg', 'image/png'))) {
-            array_push($errorList, "File type invalid");
-        }
-
-        //
-        if ($errorList) {
-            $app->render('item_addedit.html.twig', array(
-                'v' => $valueList, 'errorList' => $errorList));
+    if ($_FILES['image']['size'] != 0) {
+        $image = $_FILES['image'];
+        $imageInfo = getimagesize($image['tmp_name']);
+        if (!$imageInfo) {
+            array_push($errorList, "File does not look like a valid image");
         } else {
+            // never allow '..' in the file name
+            if (strstr($image['name'], '..')) {
+                array_push($errorList, "File name invalid");
+            }
+            // only allow select extensions
+            $ext = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, array('jpg', 'jpeg', 'gif', 'png'))) {
+                array_push($errorList, "File extension invalid");
+            }
+            // check mime-type submitted
+            //$mimeType = $image['type']; // TODO: use getimagesize result mime-type instead
+            $mimeType = $imageInfo['mime'];
+            if (!in_array($mimeType, array('image/gif', 'image/jpeg', 'image/png'))) {
+                array_push($errorList, "File type invalid");
+            }
+
+            // 
             $imageData = file_get_contents($image['tmp_name']);
-            DB::insert('items', array(
-                'title' => $title,
-                'image' => $imageData,
-                'mimeType' => $mimeType
-            ));
-            $itemId = DB::insertId();
-            $app->render('item_add_success.html.twig', array('itemId' => $itemId));
+            $valueList['image'] = $imageData;
+            $valueList['image'] = $mimeType;
         }
+    }
+
+    //
+    if ($errorList) {
+        $app->render('item_addedit.html.twig', array(
+            'v' => $valueList, 'errorList' => $errorList));
+    } else {
+        DB::insert('items', $valueList);
+        $itemId = DB::insertId();
+        $app->render('item_add_success.html.twig', array('itemId' => $itemId));
     }
 });
 // <editor-fold defaultstate="collapsed" desc="Run /item/:id/image (GET)">
@@ -195,248 +218,248 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="MeekroDB Actions">
-    
-    /*
-    //INSERT new item
-            DB::insert('items', array(
-                'ISBN' => $ISBN,
-                //Other stuff
-                'imagePath' => $image['name']
-            ));
-                            
-            //
-            $log->debug("Adding with new Id = " . DB::insertId());
-            
-            $itemId = DB::insertId();
-            $app->render('item_add_success.html.twig', array('productId' => $productId));
 
+/*
+  //INSERT new item
+  DB::insert('items', array(
+  'ISBN' => $ISBN,
+  //Other stuff
+  'imagePath' => $image['name']
+  ));
 
-            
-            
-            
-            
-    //INSERT new User
-            DB::insert('items', array(
-                'email' => $email,
-                //Other Stuff
-                'password' => $password
-            ));
-                            
-            //$log->debug("Adding with new Id = " . DB::insertId());
-            
-            $UserId = DB::insertId();
-            $_SESSION['userId'] = $userID;
-            $app->render('index.html.twig', $_SESSION['userId']);
+  //
+  $log->debug("Adding with new Id = " . DB::insertId());
 
-
-
-            
-            
-    //Query for Registered User 
-            //
-            //  NOT WORKING YET
-            //
-            $userEmail = $app->request()->post('userEmail');
-            
-            
-            $userProfile = DB::queryFirstRow("SELECT * FROM users WHERE id=%i", $userId);
-            
-            if (!$userProfile) 
-            {
-                $app->notFound();
-                return;
-            }
-                $app->render('product_view.html.twig', array('p' => $product));
-            });
-            
-            
-
-
-
-
-            
-            
-    //Query All
-            
-            
-            //Index's Sidebar is comprised of text links                    
-                //<a href = index/~~~~/~~~~>~~~~~~~</a> 
-            
-            
-            
-            //case('all') //TAKEN FROM URL TOKEN
-            $items = DB::query("SELECT * FROM items");
-            $app->render('index.html.twig', array('items' => $items));
-            
-            
-
-    //Query Type1, type2, type3
-            
-            //case('type1')     //TAKEN FROM URL TOKEN
-            //$type1            //TAKEN FROM URL TOKEN 
-            
-            $items = DB::query("SELECT * FROM items WHERE type1=%s", $type1);
-            $app->render('index.html.twig', array('items' => $items));
-            
-            
-
-            
-    //Query By Price
-            
-            //case('highprice')     //TAKEN FROM URL TOKEN
-            //$price                //TAKEN FROM URL TOKEN 
-            
-            $items = DB::query("SELECT * FROM items WHERE price>%d", $price);
-            $app->render('index.html.twig', array('items' => $items));
-            
-            
-            
-    //Order by Author 
-    
-            
-            //Add the same functionality as the sidebar 
-            //links to the author line of the main
-            
-            
-            
-            //case('author')     //TAKEN FROM URL TOKEN
-            //$author            //TAKEN FROM URL TOKEN 
-            
-            $items = DB::query("SELECT * FROM items WHERE author=%s", $author);
-            $app->render('index.html.twig', array('items' => $items));
-            
-      
-            
-            
-    //Query Disctinct ISBN's
-            
-            //case('ISDN')     //TAKEN FROM URL TOKEN
-            
-            $items = DB::query("SELECT DISTINCT ISBN FROM items");
-            $app->render('index.html.twig', array('items' => $items));
-            
-          
-            
-            
-            
-    //Query Users transaction history
-            
-            $userID = $_SESSION['userId'];
-            
-            $items = DB::query(""
-                    . "SELECT * "
-                    . "FROM orderitems "
-                    . "INNER JOIN orders "
-                    . "ON orderitems.orderId=orders.id "
-                    . "WHERE orders.userId=%s", $userID
-                    );
-            
-           
-            //If we add a timestamp to the orders we can return the 
-            //transacrion history in chroniclogical order with
-           
-                //"ORDER BY orders.timestamp ASC"
-            
-           
-            
-            $app->render('transactionhistory.html.twig', array('items' => $items));
-
-         
-
-    //Query Users Sale History
-         
-            $userID = $_SESSION['userId'];   
-            
-            $items = DB::query("SELECT * FROM items WHERE sellerId=%s", $userID);
-            $app->render('sellhistory.html.twig', array('items' => $items));
-
-            
-
-            
-    //Query Users Cart (SessionId)
-            
-            
-            $sessionId = session_id();
-            
-            $items = DB::query(""
-                    . "SELECT * "
-                    . "FROM cartitems "
-                    . "INNER JOIN items "
-                    . "ON cartitems.itemId=items.id "
-                    . "WHERE cartitems.sessionId=%s "
-                    . "ORDER BY cartitems.createdTS ASC", $userID
-                    );       
-            
-            $app->render('cart.html.twig', array('items' => $items));
-       
-
-
-
-
-    //Query Users Cart (UserId)
-                        
-            $userID = $_SESSION['userId'];
-            
-            $items = DB::query(""
-                    . "SELECT * "
-                    . "FROM cartitems "
-                    . "INNER JOIN items "
-                    . "ON cartitems.itemId=items.id "
-                    . "WHERE cartitems.userId=%s "
-                    . "ORDER BY cartitems.createdTS ASC", $userID
-                    );       
-            
-            $app->render('cart.html.twig', array('items' => $items));
-       
-       
-
-
-
-
-          
-    //Add Item to Cart
-            
-       
-
-
-
-          
-    //Remove Item from Cart
-            
-       
+  $itemId = DB::insertId();
+  $app->render('item_add_success.html.twig', array('productId' => $productId));
 
 
 
 
 
-          
-    //Remove item
-            
-            
-      
+
+  //INSERT new User
+  DB::insert('items', array(
+  'email' => $email,
+  //Other Stuff
+  'password' => $password
+  ));
+
+  //$log->debug("Adding with new Id = " . DB::insertId());
+
+  $UserId = DB::insertId();
+  $_SESSION['userId'] = $userID;
+  $app->render('index.html.twig', $_SESSION['userId']);
 
 
 
 
-    //Transaction (INSERT items in Cart to History, Remove items from Items, Delete items in Cart)
-            
-            
-          
+
+  //Query for Registered User
+  //
+  //  NOT WORKING YET
+  //
+  $userEmail = $app->request()->post('userEmail');
 
 
-    */      
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+  $userProfile = DB::queryFirstRow("SELECT * FROM users WHERE id=%i", $userId);
+
+  if (!$userProfile)
+  {
+  $app->notFound();
+  return;
+  }
+  $app->render('product_view.html.twig', array('p' => $product));
+  });
+
+
+
+
+
+
+
+
+  //Query All
+
+
+  //Index's Sidebar is comprised of text links
+  //<a href = index/~~~~/~~~~>~~~~~~~</a>
+
+
+
+  //case('all') //TAKEN FROM URL TOKEN
+  $items = DB::query("SELECT * FROM items");
+  $app->render('index.html.twig', array('items' => $items));
+
+
+
+  //Query Type1, type2, type3
+
+  //case('type1')     //TAKEN FROM URL TOKEN
+  //$type1            //TAKEN FROM URL TOKEN
+
+  $items = DB::query("SELECT * FROM items WHERE type1=%s", $type1);
+  $app->render('index.html.twig', array('items' => $items));
+
+
+
+
+  //Query By Price
+
+  //case('highprice')     //TAKEN FROM URL TOKEN
+  //$price                //TAKEN FROM URL TOKEN
+
+  $items = DB::query("SELECT * FROM items WHERE price>%d", $price);
+  $app->render('index.html.twig', array('items' => $items));
+
+
+
+  //Order by Author
+
+
+  //Add the same functionality as the sidebar
+  //links to the author line of the main
+
+
+
+  //case('author')     //TAKEN FROM URL TOKEN
+  //$author            //TAKEN FROM URL TOKEN
+
+  $items = DB::query("SELECT * FROM items WHERE author=%s", $author);
+  $app->render('index.html.twig', array('items' => $items));
+
+
+
+
+  //Query Disctinct ISBN's
+
+  //case('ISDN')     //TAKEN FROM URL TOKEN
+
+  $items = DB::query("SELECT DISTINCT ISBN FROM items");
+  $app->render('index.html.twig', array('items' => $items));
+
+
+
+
+
+  //Query Users transaction history
+
+  $userID = $_SESSION['userId'];
+
+  $items = DB::query(""
+  . "SELECT * "
+  . "FROM orderitems "
+  . "INNER JOIN orders "
+  . "ON orderitems.orderId=orders.id "
+  . "WHERE orders.userId=%s", $userID
+  );
+
+
+  //If we add a timestamp to the orders we can return the
+  //transacrion history in chroniclogical order with
+
+  //"ORDER BY orders.timestamp ASC"
+
+
+
+  $app->render('transactionhistory.html.twig', array('items' => $items));
+
+
+
+  //Query Users Sale History
+
+  $userID = $_SESSION['userId'];
+
+  $items = DB::query("SELECT * FROM items WHERE sellerId=%s", $userID);
+  $app->render('sellhistory.html.twig', array('items' => $items));
+
+
+
+
+  //Query Users Cart (SessionId)
+
+
+  $sessionId = session_id();
+
+  $items = DB::query(""
+  . "SELECT * "
+  . "FROM cartitems "
+  . "INNER JOIN items "
+  . "ON cartitems.itemId=items.id "
+  . "WHERE cartitems.sessionId=%s "
+  . "ORDER BY cartitems.createdTS ASC", $userID
+  );
+
+  $app->render('cart.html.twig', array('items' => $items));
+
+
+
+
+
+  //Query Users Cart (UserId)
+
+  $userID = $_SESSION['userId'];
+
+  $items = DB::query(""
+  . "SELECT * "
+  . "FROM cartitems "
+  . "INNER JOIN items "
+  . "ON cartitems.itemId=items.id "
+  . "WHERE cartitems.userId=%s "
+  . "ORDER BY cartitems.createdTS ASC", $userID
+  );
+
+  $app->render('cart.html.twig', array('items' => $items));
+
+
+
+
+
+
+
+  //Add Item to Cart
+
+
+
+
+
+
+  //Remove Item from Cart
+
+
+
+
+
+
+
+
+  //Remove item
+
+
+
+
+
+
+
+  //Transaction (INSERT items in Cart to History, Remove items from Items, Delete items in Cart)
+
+
+
+
+
+ */
+
+
+
+
+
+
+
+
+
+
+
+
 
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Research Notes">

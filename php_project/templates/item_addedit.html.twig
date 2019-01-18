@@ -35,12 +35,21 @@
                        placeholder="Title">
             </div>
         </div>
+
         <div class="form-group row">
             <label for="inputAuthor" class="col-sm-2 col-form-label">Author</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" id="inputAuthor"                      
                        name="author" value="{{ v.author }}"
                        placeholder="Author">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="inputTitle" class="col-sm-2 col-form-label">ISBN</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="inputTitle"                        
+                       name="isbn" value="{{ v.isbn }}"
+                       placeholder="Title">
             </div>
         </div>
         <div class="form-group row">
@@ -56,7 +65,7 @@
             <input type="range" name=condition  class="custom-range" 
                    value= {{ v.conditionofused }} 
                    ooninput="showVal(this.value)" onchange="showVal(this.value)"
-                   min="0" max="100" step="10"  id="conditionformControlRange">
+                   min="40" max="100" step="10"  id="conditionformControlRange">
         </div>
 
         <fieldset class="form-group">
@@ -87,7 +96,7 @@
         </fieldset>
         <div class="form-group">
             <label for="descriptionTextarea1">Description</label>
-            <textarea class="form-control" name="description" id="descriptionTextarea1" rows="3"></textarea>
+            <textarea class="form-control" name="description" id="descriptionTextarea1" rows="3">{{v.description}}</textarea>
         </div>
         <div class="form-group row">
             <div class="col-sm-10">
