@@ -14,13 +14,23 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
-DB::$user = 'bootstore';
-DB::$dbName = 'bootstore';
-DB::$password = 'vuxunjqTbm5S7sAq';
-DB::$port = 3333;
-DB::$host = 'localhost';
-DB::$encoding = 'utf8';
-DB::$error_handler = 'db_error_handler';
+if (false) {
+    DB::$user = 'bootstore';
+    DB::$dbName = 'bootstore';
+    DB::$password = 'vuxunjqTbm5S7sAq';
+    DB::$port = 3333;
+    DB::$host = 'localhost';
+    DB::$encoding = 'utf8';
+    DB::$error_handler = 'db_error_handler';
+} else {
+    DB::$user = 'bootstore';
+    DB::$dbName = 'bootstore';
+    DB::$password = 'vuxunjqTbm5S7sAq';
+    DB::$port = 3306;
+    DB::$host = 'localhost';
+    DB::$encoding = 'utf8';
+    DB::$error_handler = 'db_error_handler';
+}
 
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Error-Handler">
@@ -46,6 +56,7 @@ $view->parserOptions = array(
 );
 $view->setTemplatesDirectory(dirname(__FILE__) . '/templates');
 // </editor-fold>
+
 // <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
     $sessionID = session_id();
@@ -61,21 +72,91 @@ $app->get('/', function() use ($app, $log) {
     // -----------------debugging --------------------
     //Pass todos to index HTML as array of todos
     $app->render('index.html.twig', array(
-        'sessionID' => $sessionID, 
+        'sessionID' => $sessionID,
         'books' => $books));
 });
 // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="Run addedit item Page (GET POST)">
-$app->get('/add', function() use ($app, $log) {
-    //Pass todos to index HTML as array of todos
-    $errorList = array();
-    $item = array();
-    $app->render('addedititem.html.twig', array(
-        'errorList' => $errorList,
-        'v' => $item));
+// <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
+$app->get('/admin/item/add', function() use ($app, $log) {
+    // fetch the first step of book classification
+    $classes = DB::query("SELECT * FROM classes WHERE code LIKE '%00'");
+    // stage 1 get form
+    $app->render('item_addedit.html.twig', array(
+        'Classification' => array(
+            '1' => $classes
+        )
+    ));
 });
-$app->post('/add', function() use ($app, $log) {
+$app->post('/admin/item/add', function() use ($app, $log) {
+    // -----------------debugging --------------------
+//    var_dump($_SESSION['user']);
+    print_r($_FILES);
+    echo '<hr />';
     var_dump($_POST);
+    echo '<hr />';
+    // -----------------debugging --------------------
+    // 
+    $id = $app->request()->post('id');
+    $title = $app->request()->post('title');
+    $author = $app->request()->post('author');
+    $price = $app->request()->post('price');
+    $description = $app->request()->post('condition');
+    $condition = $app->request()->post('condition');
+
+    $valueList = array('id' => $id, 'title' => $title, 'author' => $author, 'price' => $price, 'description' => $description, 'condition' => $condition);
+    //
+    $errorList = array();
+    if (strlen($title) < 2 || strlen($title) > 200) {
+        array_push($errorList, "Number must be 8-12 characters long");
+    }
+
+    // 
+    $image = $_FILES['image'];
+    $imageInfo = getimagesize($image['tmp_name']);
+    if (!$imageInfo) {
+        array_push($errorList, "File does not look like a valid image");
+    } else {
+        // never allow '..' in the file name
+        if (strstr($image['name'], '..')) {
+            array_push($errorList, "File name invalid");
+        }
+        // only allow select extensions
+        $ext = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, array('jpg', 'jpeg', 'gif', 'png'))) {
+            array_push($errorList, "File extension invalid");
+        }
+        // check mime-type submitted
+        //$mimeType = $image['type']; // TODO: use getimagesize result mime-type instead
+        $mimeType = $imageInfo['mime'];
+        if (!in_array($mimeType, array('image/gif', 'image/jpeg', 'image/png'))) {
+            array_push($errorList, "File type invalid");
+        }
+
+        //
+        if ($errorList) {
+            $app->render('item_addedit.html.twig', array(
+                'v' => $valueList, 'errorList' => $errorList));
+        } else {
+            $imageData = file_get_contents($image['tmp_name']);
+            DB::insert('items', array(
+                'title' => $title,
+                'image' => $imageData,
+                'mimeType' => $mimeType
+            ));
+            $itemId = DB::insertId();
+            $app->render('item_add_success.html.twig', array('itemId' => $itemId));
+        }
+    }
+});
+// <editor-fold defaultstate="collapsed" desc="Run /item/:id/image (GET)">
+$app->get('/item/:id/image', function($id) use ($app, $log) {
+    $item = DB::queryFirstRow("SELECT image, mimeType FROM items WHERE id=%i", $id);
+    if (!$item) {
+        $app->notFound();
+        return;
+    }
+    $app->response()->header('content-type', $item['mimeType']);
+    echo $item['image'];
 });
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
