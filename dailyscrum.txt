@@ -3,7 +3,7 @@ DAILY SCRUM - EVERY DAY AT 9AM
 
 ==============================2019/01/18   ========================================
 
-2019/01/18,19,20 Scott
+2019/01/18 Scott
 1. Done since the last scrum:
 Build Html modules for testing (item & index)
 - Import Database
