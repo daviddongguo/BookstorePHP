@@ -3,7 +3,57 @@ DAILY SCRUM - EVERY DAY AT 9AM
 
 ==============================2019/01/18   ========================================
 
-Scott
+2019/01/18,19,20 Scott
+1. Done since the last scrum:
+Build Html modules for testing (item & index)
+- Import Database
+- Write Queries and CRUD 
+- Setup Xampp COnfig (Directory Access Exception)
+2. To do until next Scrum:
+- PHP for urls'
+- Update Trello
+- Get sample images for books 
+- Login  
+- Navigation (Logged Out)
+- Navigation (Logged In) 
+- Add Navigation to master
+- Index.sidebar
+- Write MeekroDB SQL Operations (Also mark in Trello)
+	- Insert new item
+	- Add User
+	- Query for for Registered User Id
+	- Query for Email
+	- Query All
+	- Query Type1
+	- Query Type2
+	- Query Type3
+	- Query By Price	
+	- Order by Author
+	- Query Disctinct ISBN's
+	- Query Users transaction history
+	- Query Users Sale History
+	- Query Users Cart (SessionId)
+	- Query Users Cart (UserId)
+	- Add Item to Cart
+	- Remove Irem from Cart
+	- Remove item
+	- Transaction (INSERT items in Cart to History, Remove items from Items, Delete items in Cart)
+- Write PHP paths/routes
+	- 'Index' to 'Index' - (/ -> /*criteria* 
+	- 'Index' to 'Item'
+	- 'Index' to 'Cart'
+	- 'Index' to 'Logout' 			- While Logged on
+	- 'Index' to 'Register' 		- While Logged off
+	- 'Index' to 'Login' 			- While Logged off
+	- 'Index' to 'Sell' 			- While logged on
+	- 'Index' to 'SaleHistory' 		- While logged on
+	- 'Index' to 'TransactionHistory' 	- While logged on
+	- 'Register' to 'Login' 		- While logged off
+	- 'Item' to 'Cart'
+	- 'Cart' to 'Checkout'			- While logged on 
+- * Reconfigure DB
+3. Need assistance/figure things out
+- PHP-Spider?
 
 
 Dongguo
