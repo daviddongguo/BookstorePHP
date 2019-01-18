@@ -63,14 +63,14 @@
             <div class="row">
                 <legend class="col-form-label col-sm-4 pt-0">Dewey Decimal Classification</legend>
                 <select class="custom-select my-1 mr-sm-2" onchange="addSecondOption(this.value)"
-                        id="firstClass" value="000">
+                        id="firstClass">
                     <option selected>Choose...</option>
                 </select>
                 <select class="custom-select my-1 mr-sm-2" onchange="addThirdOption(this.value)"
-                        id="secondClass"  value="000">
+                        id="secondClass">
                     <option selected>Choose...</option>
                 </select>
-                <select class="custom-select my-1 mr-sm-2" id="thirdClass"  value="000">
+                <select class="custom-select my-1 mr-sm-2" id="thirdClass">
                     <option selected>Choose...</option>
                 </select>
             </div>
@@ -117,8 +117,11 @@
             document.getElementById("valBox").innerHTML = newVal;
         }
 
+        // Fetch default data from data 
         $(document).ready(function () {
             addOptions("000", "firstClass");
+            addOptions("0", "secondClass");
+            addOptions("00", "thirdClass");
         });
 
         function addSecondOption(code) {
