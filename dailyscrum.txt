@@ -1,6 +1,18 @@
 DAILY SCRUM - EVERY DAY AT 9AM
 ==============================
 
+==============================2019/01/19   ========================================
+
+2019/01/18 Dongguo
+1. Done since the last scrum:
+- fetch information from the database with AJAX in add-item-page.
+- insert all data into classes table. 
+2. To do until next Scrum:
+- update the function adding book
+- research the spider technology 
+3. Need assistance/figure things out
+- how to show and post the latest value of there selects(book class) . 
+
 ==============================2019/01/18   ========================================
 
 2019/01/18 Scott
