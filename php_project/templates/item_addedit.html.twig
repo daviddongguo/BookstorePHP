@@ -55,16 +55,16 @@
         <div class="form-group row">
             <label for="inputPrice" class="col-sm-2 col-form-label">Price</label>
             <div class="col-sm-10">
-                <input type="number" class="form-control"    min-="1.10"    step="0.1"                
+                <input type="text" class="form-control"                    
                        name="price" value="{{ v.price }}"
                        id="inputPrice" placeholder="Price">
             </div>
         </div>
         <div class="form-group">
-            <label for="conditionformControlRange"><p id="conditionLable" >Condition: <span id="valBox"></span> %</p></label>
+            <label for="conditionformControlRange"><p id="conditionLable" >Condition: <span id="conditionValue"></span> %</p></label>
             <input type="range" name="condition"  class="custom-range" 
                    value= {{ v.conditionofused }} 
-                   ooninput="showVal(this.value)" onchange="showVal(this.value)"
+                   oninput="showVal(this.value)" onchange="showVal(this.value)"
                    min="40" max="100" step="10"  id="conditionformControlRange">
         </div>
 
@@ -72,16 +72,16 @@
             <div class="row">
                 <legend class="col-form-label col-sm-5 pt-0">
                     Dewey Decimal Classification
-                    <input type="text" id="bookclass"  value={{ v.bookclass }}>
+                    <input type="text" id="bookclass"  name="bookclass" value='{{ v.bookclass }}'>
                 </legend>
 
-                <select class="custom-select my-1 mr-sm-2"  name="bookclass" onchange="addSecondOption(this.value)"
+                <select class="custom-select my-1 mr-sm-2" onchange="addSecondOption(this.value)"
                         id="firstClass">
                 </select>
-                <select class="custom-select my-1 mr-sm-2"  name="bookclass" onchange="addThirdOption(this.value)"
+                <select class="custom-select my-1 mr-sm-2" onchange="addThirdOption(this.value)"
                         id="secondClass">
                 </select>
-                <select class="custom-select my-1 mr-sm-2" name="bookclass"  
+                <select class="custom-select my-1 mr-sm-2" onchange="showSelected(this.value)" 
                         id="thirdClass" >
                 </select>
             </div>
@@ -123,46 +123,52 @@
             var output = document.getElementById('preview');
             output.src = URL.createObjectURL(event.target.files[0]);
         };
+
         function showVal(newVal) {
-            document.getElementById("valBox").innerHTML = newVal;
+            document.getElementById("conditionValue").innerHTML = newVal;
         }
 
         // Fetch default data from data 
         $(document).ready(function () {
-{#            document.getElementById(bookclass).value = "000";#}
-            addOptions("000", "firstClass");
-        });
-        function addSecondOption(code) {
-{#            document.getElementById(bookclass).value = code;#}
-            code = code.substring(0, 1);
-            addOptions(code, "secondClass");
-        }
-
-        function addThirdOption(code) {
-{#            document.getElementById(bookclass).value = code;#}
-            code = code.substring(0, 2);
-            addOptions(code, "thirdClass");
-        }
-
-
-
-        function addOptions(code, idOfSelect) {
-            if (window.XMLHttpRequest) {
-                // code for IE7+, Firefox, Chrome, Opera, Safari
-                xmlhttp = new XMLHttpRequest();
-            } else {
-                // code for IE6, IE5
-                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        {#            document.getElementById(bookclass).value = "000";#}
+                addOptions("000", "firstClass");
+            });
+            function addSecondOption(code) {
+                showSelected(code);
+                code = code.substring(0, 1);
+                addOptions(code, "secondClass");
             }
-            xmlhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById(idOfSelect).innerHTML = this.responseText;
-                    console.log(this.responseText);
+
+            function addThirdOption(code) {
+                showSelected(code);
+                code = code.substring(0, 2);
+                addOptions(code, "thirdClass");
+            }
+
+            function showSelected(value) {
+                console.log("book class : " + value);
+                document.getElementById('bookclass').value = value;
+            }
+
+
+
+            function addOptions(code, idOfSelect) {
+                if (window.XMLHttpRequest) {
+                    // code for IE7+, Firefox, Chrome, Opera, Safari
+                    xmlhttp = new XMLHttpRequest();
+                } else {
+                    // code for IE6, IE5
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
                 }
-            };
-            xmlhttp.open("GET", "/item/" + code + "/class");
-            xmlhttp.send();
-        }
+                xmlhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById(idOfSelect).innerHTML = this.responseText;
+                        console.log(this.responseText);
+                    }
+                };
+                xmlhttp.open("GET", "/item/" + code + "/class");
+                xmlhttp.send();
+            }
 
     </script>
 {% endblock %}

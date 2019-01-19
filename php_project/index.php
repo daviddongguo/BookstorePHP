@@ -236,10 +236,10 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
         if ($isFirstOption) {
             $isFirstOption = false;
             echo "<option value='000' selected>Choose...</option>";
-            echo "<option value=" . $row['code'] . ">";
+            echo "<option value='" . $row['code'] . "'>";
             echo $row['name'] . "</option>\n";
         } else {
-            echo "<option value=" . $row['code'] . ">";
+            echo "<option value='" . $row['code'] . "'>";
             echo $row['name'] . "</option>\n";
         }
     }
