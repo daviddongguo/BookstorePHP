@@ -44,7 +44,6 @@ function db_error_handler($params) {
     $app->render('fatal_error.html.twig');
     die; // don't want to keep going if a query broke
 }
-
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Slim creation and setup">
 $app = new \Slim\Slim(array(
@@ -57,6 +56,21 @@ $view->parserOptions = array(
     'cache' => dirname(__FILE__) . '/cache'
 );
 $view->setTemplatesDirectory(dirname(__FILE__) . '/templates');
+// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="Add User and Session to superglobals">
+if (!isset($_SESSION['userId'])) 
+{
+    $_SESSION['userId'] = array();
+}
+
+if (!isset($_SESSION['sessionId'])) 
+{
+    $_SESSION['sessionId'] = session_id();
+}
+
+$twig = $app->view()->getEnvironment();
+$twig->addGlobal('global_userId', $_SESSION['userId']);
+$twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
@@ -77,11 +91,161 @@ $app->get('/', function() use ($app, $log) {
         'books' => $books));
 });
 // </editor-fold>
+
+
+
+
+
+
+// <editor-fold desc="Index Page">
+$app->get('/', function() use ($app, $log) 
+{
+    $books = DB::query("SELECT * FROM items");
+    
+    $app->render('index.html.twig', array('books' => $books));
+});
+// </editor-fold>
+
+// <editor-fold desc="Login Page">
+$app->get('/login', function() use ($app, $log) 
+{
+    //  No Check on userId needed, if user is already 
+    //  logged in they can change accounts by logging in.
+    $app->render('login.html.twig');
+});
+// </editor-fold> 
+
+// <editor-fold desc="Logout Page">
+$app->get('/logout', function() use ($app, $log) 
+{
+    if ($_SESSION['userId'])
+    {
+        $_SESSION['userId'] = array();
+        $app->render('logout.html.twig');
+    }
+    else
+    {
+        $log->addAlert('Unregistered user tried to LOGOUT');
+        $app->render('index.html.twig');
+    }  
+});
+// </editor-fold> 
+
+// <editor-fold desc="Cart Page">
+$app->get('/cart', function() use ($app, $log) 
+{
+    if ($_SESSION['userId'])
+    {
+        $items = DB::query(""
+            . "SELECT * "
+            . "FROM cartitems "
+            . "INNER JOIN items "
+            . "ON cartitems.itemId=items.id "
+            . "WHERE cartitems.userId=%s "
+            . "ORDER BY cartitems.createdTS ASC", $_SESSION['userId']);
+    }
+    else
+    {
+        $items = DB::query(""
+            . "SELECT * "
+            . "FROM cartitems "
+            . "INNER JOIN items "
+            . "ON cartitems.itemId=items.id "
+            . "WHERE cartitems.sessionId=%s "
+            . "ORDER BY cartitems.createdTS ASC", $_SESSION['sessionId']);
+    }
+    
+    $app->render('cart.html.twig', array('items' => $items));
+});
+// </editor-fold> 
+
+// <editor-fold desc="Transaction History Page">
+$app->get('/transactionhistory', function() use ($app, $log) 
+{
+    if ($_SESSION['userId'])
+    {
+        $items = DB::query(""
+            . "SELECT * "
+            . "FROM orderitems "
+            . "INNER JOIN orders "
+            . "ON orderitems.orderId=orders.id "
+            . "WHERE orders.userId=%s", $_SESSION['userId']);
+        //If we add a timestamp to the orders we can return the
+        //transacrion history in chroniclogical order with
+        //"ORDER BY orders.timestamp ASC"
+        $app->render('transactionhistory.html.twig', array('items' => $items));
+    }
+    else
+    {
+        $log->addAlert('Unregistered user tried to Access TRANSACTION HISTORY');
+        $app->render('index.html.twig');
+    }
+});
+// </editor-fold>
+
+// <editor-fold desc="Sell History Page">
+$app->get('/sellhistory', function() use ($app, $log) 
+{
+    if ($_SESSION['userId'])
+    {
+        $items = DB::query("SELECT * FROM items WHERE sellerId=%s", $_SESSION['userId']);
+        $app->render('sellhistory.html.twig', array('items' => $items));
+    }
+    else
+    {
+        $log->addAlert('Unregistered user tried to Access SALES HISTORY');
+        $app->render('index.html.twig');
+    }
+});
+// </editor-fold> 
+
+// <editor-fold desc="Sell Page">
+$app->get('/sell', function() use ($app, $log) 
+{
+    if ($_SESSION['userId'])
+    {
+        $app->render('sell.html.twig');
+    }
+    else
+    {
+        $log->addAlert('Unregistered user tried to Access SELL');
+        $app->render('index.html.twig');
+    }
+});
+// </editor-fold> 
+
+
+
+// <editor-fold desc="Registration Page">
+$app->get('/register', function() use ($app, $log) 
+{
+    
+    
+    $app->render('register.html.twig'); 
+});
+// </editor-fold> 
+
+
+
+
+
+
+
+ 
 // <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
 $app->get('/admin/item/add', function() use ($app, $log) {
     // stage 1 get form
     $app->render('item_addedit.html.twig');
 });
+
+
+
+
+
+
+
+
+
 $app->post('/admin/item/add', function() use ($app, $log) {
     // -----------------debugging --------------------
 //    var_dump($_SESSION['user']);
