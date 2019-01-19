@@ -97,6 +97,7 @@ $app->post('/admin/item/add', function() use ($app, $log) {
     $isbn = $app->request()->post('isbn');
     $description = $app->request()->post('description');
     $condition = $app->request()->post('condition');
+    $bookclass = $app->request()->post('bookclass');
     $price = $app->request()->post('price');
     $imageData = null;
     $mimeType = null;
@@ -129,12 +130,10 @@ $app->post('/admin/item/add', function() use ($app, $log) {
     if ($condition < 40 || $condition > 100) {
         array_push($errorList, "Condition($condition) must be 40-100");
     }
-    if ($price <= 0 || $price > 999.99) {
+    if (!is_numeric($price)||$price <= 0 || $price > 999.99) {
         array_push($errorList, "Price($price) invalid");
     }
-    if ($price <= 0 || $price > 999.99) {
-        array_push($errorList, "Price($price) invalid");
-    }
+
 
     // 
     if ($_FILES['image']['size'] != 0) {
@@ -189,6 +188,7 @@ $app->post('/admin/item/add', function() use ($app, $log) {
             'author' => $author,
             'ISBN' => $isbn,
             'description' => $description,
+            'DeweyDecimalClass' => $bookclass,
             'conditionofused' => $condition,
             'price' => $price,
             'image' =>  $imageData,
