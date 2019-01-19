@@ -16,7 +16,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
 DB::debugMode();
 
-if (true) {
+if (false) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
@@ -95,7 +95,7 @@ $app->post('/admin/item/add', function() use ($app, $log) {
     $title = $app->request()->post('title');
     $author = $app->request()->post('author');
     $isbn = $app->request()->post('isbn');
-    $description = $app->request()->post('condition');
+    $description = $app->request()->post('description');
     $condition = $app->request()->post('condition');
     $price = $app->request()->post('price');
     $imageData = null;
@@ -117,19 +117,22 @@ $app->post('/admin/item/add', function() use ($app, $log) {
     if (strlen($title) < 2 || strlen($title) > 200) {
         array_push($errorList, "Title($title) must be 2-200 characters long");
     }
-    if ($author < 2 || $author > 100) {
+    if (strlen($author) < 2 || strlen($author) > 100) {
         array_push($errorList, "Author($author) must be 2-100 characters long");
     }
-    if ($isbn < 2 || $isbn > 500) {
-        array_push($errorList, "ISBN($author) invalid");
+    if (strlen($isbn) < 2 || strlen($isbn) > 20) {
+        array_push($errorList, "ISBN($isbn) invalid");
     }
     if (strlen($description) < 20 || strlen($description) > 200) {
         array_push($errorList, "Description must be 20-2000 characters long");
     }
     if ($condition < 40 || $condition > 100) {
-        array_push($errorList, "Condition must be 40-100");
+        array_push($errorList, "Condition($condition) must be 40-100");
     }
-    if ($price < 0 || $price > 999.99) {
+    if ($price <= 0 || $price > 999.99) {
+        array_push($errorList, "Price($price) invalid");
+    }
+    if ($price <= 0 || $price > 999.99) {
         array_push($errorList, "Price($price) invalid");
     }
 
@@ -159,7 +162,7 @@ $app->post('/admin/item/add', function() use ($app, $log) {
             // 
             $imageData = file_get_contents($image['tmp_name']);
             $valueList['image'] = $imageData;
-            $valueList['image'] = $mimeType;
+            $valueList['mimeType'] = $mimeType;
         }
     }
 
@@ -168,7 +171,29 @@ $app->post('/admin/item/add', function() use ($app, $log) {
         $app->render('item_addedit.html.twig', array(
             'v' => $valueList, 'errorList' => $errorList));
     } else {
-        DB::insert('items', $valueList);
+//        var_dump(array(
+//            'id' => $id,
+//            'title' => $title,
+//            'author' => $author,
+//            'ISBN' => $isbn,
+//            'description' => $description,
+//            'conditionofused' => $condition,
+//            'price' => $price,
+//            'image' => $imageData,
+//            'mimeType' => $mimeType
+//        ));
+//        return;
+        DB::insert('items', array(
+            'id' => $id,
+            'title' => $title,
+            'author' => $author,
+            'ISBN' => $isbn,
+            'description' => $description,
+            'conditionofused' => $condition,
+            'price' => $price,
+            'image' =>  $imageData,
+            'mimeType' => $mimeType
+        ));
         $itemId = DB::insertId();
         $app->render('item_add_success.html.twig', array('itemId' => $itemId));
     }
@@ -206,10 +231,17 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
     }
 //    var_dump($results);
     // <option value="{{ c.code }}">{{ c.name }}</option>
-
+    $isFirstOption = true;
     foreach ($results as $row) {
-        echo "<option value=" . $row['code'] . ">";
-        echo $row['name'] . "</option>\n";
+        if ($isFirstOption) {
+            $isFirstOption = false;
+            echo "<option value='000' selected>Choose...</option>";
+            echo "<option value=" . $row['code'] . ">";
+            echo $row['name'] . "</option>\n";
+        } else {
+            echo "<option value=" . $row['code'] . ">";
+            echo $row['name'] . "</option>\n";
+        }
     }
 });
 
