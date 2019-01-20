@@ -16,7 +16,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
 DB::debugMode();
 
-if (false) {
+if (true) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
@@ -214,21 +214,14 @@ $app->get('/sell', function() use ($app, $log)
 });
 // </editor-fold> 
 
-
-
 // <editor-fold desc="Registration Page">
 $app->get('/register', function() use ($app, $log) 
 {
-    
-    
+    //  No Check on userId needed, if user is already 
+    //  logged in they can register a new account.   
     $app->render('register.html.twig'); 
 });
 // </editor-fold> 
-
-
-
-
-
 
 
  
@@ -557,9 +550,7 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
   //"ORDER BY orders.timestamp ASC"
 
 
-
   $app->render('transactionhistory.html.twig', array('items' => $items));
-
 
 
   //Query Users Sale History
@@ -610,40 +601,104 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
 
 
 
+//Add Item to Cart
+    
+    $item = DB::query("SELECT id FROM items WHERE id=%d", $itemId);
 
+    DB::insert('cartitems', array(
+        'userid'=>$_SESSION['userId'], 
+        'itemId'=>$item['id'], 
+        'sessionId'=>$_SESSION['sessionId']));
 
+    
 
-  //Add Item to Cart
-
-
-
-
-
-
-  //Remove Item from Cart
-
-
-
-
-
-
-
-
-  //Remove item
+//Remove Item from Cart
+    $itemId = $app->request()->post('itemId');
+    DB::delete('cartitems', "id=%d", $itemId); 
 
 
 
 
+//Remove item
+    $itemId = $app->request()->post('itemId');
+    DB::delete('items', "id=%d", $itemId);
 
 
 
-  //Transaction (INSERT items in Cart to History, Remove items from Items, Delete items in Cart)
+    
+//Purchase Transaction(INSERT items in Cart to History, Remove items from Items, Delete items in Cart)
 
+// 0. Attempt Transaction    
+try 
+{
+    DB::startTransaction();
+    
+    // 1: Create New Order
+    DB::Insert('orders', array(
+        'userId'=>$_SESSION['userId'],
+        'address'=>$app->request()->post('address'),
+        'postalCode'=>$app->request()->post('postalCode'),
+        'phone'=>$app->request()->post('phone'),
+        'paymentInfo'=>$app->request()->post('paymentInfo')));
+         
+    $orderId = DB::insertId();
+    
+    
+    // 2. Get all Cart Items
+    $cartItems = DB::query(""
+            . "SELECT i.itemId, i.title, i.author, i.ISBN, "
+            . "i.price, i.genre, i.type, i.sellerId, i.status"
+            . "FROM cartitems AS ci, items AS o"
+            . "INNER JOIN items"
+            . "ON cartitems.itemId=items.id "
+            . "WHERE cartitems.userId=%s ", $userID);
+    
+    
+    
+    // 3. Add CartItems to OrderItems
+    foreach($cartItems as $cartItem)
+    {
+        DB::insert('orderitems', array(
+            'orderId'=>$orderId,
+            'itemId'=>$cartItem['itemId'],
+            'title'=>$cartItem['title'],
+            'author'=>$cartItem['author'],
+            'ISBN'=>$cartItem['ISBN'],
+            'price'=>$cartItem['price'],
+            'genre'=>$cartItem['genre'],
+            'type'=>$cartItem['type'],
+            'sellerId'=>$cartItem['sellerId'],
+            'status'=>$cartItem['status']));
+        
+        
+        
+        // 4. Delete items from Items table
+        DB::delete('items', "id=%d", $cartItem['itemId']);
+        
+        
+        
+        // 5. Delete items from CartItems table
+        DB::Delete('caritems', "itemId=%d", $cartItem['itemId']);  
+    }
+    
+    // 6. Commit Changes
+    DB::commit();
+    $app->render('order_success.html.twig', $cartItems);
+    
+} 
+// 7. Handle Transaction failure
+catch (MeekroDBException $e) 
+{    
+    DB::rollback();
+    sql_error_handler(array(
+        'error' => $e->getMessage(),
+        'query' => $e->getQuery()));
+}
+    
+    
 
-
-
-
- */
+    
+*/
 
 
 

@@ -1,7 +1,33 @@
 DAILY SCRUM - EVERY DAY AT 9AM
 ==============================
 
+
+
+
+
+
 ==============================2019/01/19   ========================================
+
+2019/01/19 Scott
+1. Done since the last scrum:
+Build Html modules for testing (item & index)
+- Write MeekroDB SQL Operations (Also mark in Trello)
+- Update Trello
+- PHP for urls' (GET Only)
+- Get sample images for books
+- Login Form
+- Login Headers (You are logged out/You are logged in)
+- Navigation (Logged Out)
+- Navigation (Logged In)
+- Write PHP paths/routes
+2. To do until next Scrum:
+- Index.sidebar
+- PHP-Spider
+- Create Templates for Purchase_successful  
+- Create HTML and Twig for pages
+3. Need assistance/figure things out
+- ...
+
 
 2019/01/18 Dongguo
 1. Done since the last scrum:
