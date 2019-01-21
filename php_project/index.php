@@ -14,7 +14,7 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
-DB::debugMode();
+//DB::debugMode();
 
 if (true) {
     DB::$user = 'bootstore';
@@ -85,7 +85,7 @@ $app->get('/', function() use ($app, $log) {
 });
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
-$app->get('/:criteria1/:criteria2/:criteria3', function(
+$app->get('scott/:criteria1/:criteria2/:criteria3', function(
         $criteria1 = 'all',
         $criteria2 = 'null',
         $criteria3 = 'null') use ($app, $log) {
@@ -321,7 +321,7 @@ $app->post('/item/addtocart/:itemId', function($itemId) use ($app, $log) {
         'sessionId' => $sessionID
     ));
     $counter = DB::affectedRows();
-    DB::delete('items', "id=%i", $itemId);
+//    DB::delete('items', "id=%i", $itemId);
     if ($counter == 1) {
         echo $counter . " book added to the cart.";
         DB::commit();
@@ -330,8 +330,7 @@ $app->post('/item/addtocart/:itemId', function($itemId) use ($app, $log) {
         DB::rollback();
     }
 
-
-    echo $id . 'add to cart successfully';
+    echo $itemId . 'add to cart successfully';
 });
 // </editor-fold> 
 // <editor-fold desc="Run /admin/item/:action(/:id) (GET POST)">
@@ -362,12 +361,13 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
         $app->notFound();
         return;
     }
+
 // -----------------debugging --------------------
-    var_dump($_SESSION['user']);
-    var_dump($_FILES);
-    echo '<hr />';
-    var_dump($_POST);
-    echo '<hr />';
+//    var_dump($_SESSION['user']);
+//    var_dump($_FILES);
+//    echo '<hr />';
+//    var_dump($_POST);
+//    echo '<hr />';
 // -----------------debugging --------------------
 // 
     $id = $app->request()->post('id');
@@ -485,7 +485,8 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
         $itemId = DB::insertId();
         $app->render('item_add_success.html.twig', array('itemId' => $itemId));
     }
-})->conditions(array('action' => '(add|edit)', 'id' => '[0-9]+'));
+});
+//        ->conditions(array('action' => '(add|edit)', 'id' => '[0-9]+'));
 // </editor-fold> 
 // <editor-fold desc="Run /item/:id/image (GET)">
 $app->get('/item/:id/image', function($id) use ($app, $log) {

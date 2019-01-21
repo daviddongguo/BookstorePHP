@@ -64,8 +64,7 @@
         <div class="form-group">
             <label for="conditionformControlRange">
                 <p id="conditionLable" >Condition: <span id="conditionValue">{{ v.conditionofused }}</span> %</p></label>
-            <input type="range" name="condition"  class="custom-range" 
-                   value= {{ v.conditionofused }} 
+            <input type="range" name="condition"  class="custom-range" value= {{ v.conditionofused }} 
                    oninput="showVal(this.value)" onchange="showVal(this.value)"
                    min="40" max="100" step="10"  id="conditionformControlRange">
         </div>
@@ -134,44 +133,44 @@
 
         // Fetch default data from data 
         $(document).ready(function () {
-        {#            document.getElementById(bookclass).value = "000";#}
-                addOptions("000", "firstClass");
-            });
-            function addSecondOption(code) {
-                showSelected(code);
-                code = code.substring(0, 1);
-                addOptions(code, "secondClass");
-            }
+            addOptions("000", "firstClass");
+            addOptions("0", "secondClass");
+        });
+        function addSecondOption(code) {
+            showSelected(code);
+            code = code.substring(0, 1);
+            addOptions(code, "secondClass");
+        }
 
-            function addThirdOption(code) {
-                showSelected(code);
-                code = code.substring(0, 2);
-                addOptions(code, "thirdClass");
-            }
+        function addThirdOption(code) {
+            showSelected(code);
+            code = code.substring(0, 2);
+            addOptions(code, "thirdClass");
+        }
 
-            function showSelected(value) {
-                console.log("book class : " + value);
-                document.getElementById('bookclass').value = value;
-            }
+        function showSelected(value) {
+            console.log("book class : " + value);
+            document.getElementById('bookclass').value = value;
+        }
 
-            function addOptions(code, idOfSelect) {
-                if (window.XMLHttpRequest) {
-                    // code for IE7+, Firefox, Chrome, Opera, Safari
-                    xmlhttp = new XMLHttpRequest();
-                } else {
-                    // code for IE6, IE5
-                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        function addOptions(code, idOfSelect) {
+            if (window.XMLHttpRequest) {
+                // code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                // code for IE6, IE5
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById(idOfSelect).innerHTML = this.responseText;
+                    console.log(this.responseText);
                 }
-                xmlhttp.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById(idOfSelect).innerHTML = this.responseText;
-                        console.log(this.responseText);
-                    }
-                };
-                // TODO: use index to show one option has been selected
-                xmlhttp.open("GET", "/item/" + code + "/class");
-                xmlhttp.send();
-            }
+            };
+            // TODO: use index to show one option has been selected
+            xmlhttp.open("GET", "/item/" + code + "/class");
+            xmlhttp.send();
+        }
 
 
 
