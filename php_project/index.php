@@ -98,7 +98,7 @@ $app->get('/', function() use ($app, $log) {
 });
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
-$app->get('scott/:criteria1/:criteria2/:criteria3', function(
+$app->get('/scott/:criteria1/:criteria2/:criteria3', function(
         $criteria1 = 'all',
         $criteria2 = 'null',
         $criteria3 = 'null') use ($app, $log) {
