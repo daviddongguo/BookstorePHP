@@ -2,20 +2,7 @@ DAILY SCRUM - EVERY DAY AT 9AM
 ==============================
 
 
-==============================2019/01/20   ========================================
 
-2019/01/21 Scott
-1. Done since the last scrum:
-- Create HTML and Twig for pages
-2. To do until next Scrum:
-- HTML and CSS for items in:
-	- cart.html.twig
-	- transactionhistory.html.twig
-	- sellhistory.html.twig
-- HTML and CSS for item.html.twig
-- Build new Header(Master) with loggedin/logged out notice and links
-3. Need assistance/figure things out
-- ...
 
 
 
@@ -23,7 +10,7 @@ DAILY SCRUM - EVERY DAY AT 9AM
 
 2019/01/19 Scott
 1. Done since the last scrum:
-- Build Html modules for testing (item & index)
+Build Html modules for testing (item & index)
 - Write MeekroDB SQL Operations (Also mark in Trello)
 - Update Trello
 - PHP for urls' (GET Only)
