@@ -1,0 +1,34 @@
+{% extends "master.html.twig" %}
+
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+    <h3>Success</h3>
+    
+    <div class="productView">
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Book Title</th>
+                    <th scope="col">Created Time</th>
+                    <th scope="col">Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <th scope="row">{{v.id}}</th>
+                    <td>{{v.userId}}</td>
+                    <td>{{v.itemId}}</td>
+                    <td>{{v.createdTS}}</td>
+                    <td><a href="/cart/remove/{{ v.id }}">Remove</a></td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

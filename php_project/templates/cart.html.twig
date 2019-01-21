@@ -1,10 +1,42 @@
 {% extends "master.html.twig" %}
 
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+
+    <div class="productView">
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">User Email</th>
+                    <th scope="col">Book Title</th>
+                    <th scope="col">Created Time</th>
+                    <th scope="col">Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for item in cartitems %}
+                    <tr>
+                        <th scope="row">{{item.id}}</th>
+                        <td>{{item.userEmail}}</td>
+                        <td>{{item.title}}</td>
+                        <td>{{item.createdTS}}</td>
+                        <td>
+                            <form action='/cart/remove/{{item.id}}' method='post' >
+                                <div class="pull-right">
+                                    <input type="submit" class="btn btn-success" value="Remove" />
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor%}
 
 
+            </tbody>
+        </table>
+    </div>
 
-
-
-
-
-
+{% endblock %}

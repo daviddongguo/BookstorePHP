@@ -16,7 +16,8 @@
 {% block content %}
 
     <div>
-        <h2>Welcome, your sessionID is {{sessionID}}</h2>
+        <h3>Welcome, your sessionID is {{sessionID}}</h3>
+        <h3>Welcome, your userId is {{ userId }}</h3>
         {% for book in books %}
 
             <div class="well">
@@ -31,7 +32,7 @@
                     <span class="pull-right label label-primary">{{book.author}}</span>
                     <span class="pull-right label label-primary">${{book.price}}</span>
                 </h3>
-                <form action='/item/addtocart/{{book.id}}' method='post' >
+                <form action='/cart/add/{{book.id}}' method='post' >
                     <div class="pull-right">
                         <input type="submit" class="btn btn-success" value="Add to cart" />
                     </div>

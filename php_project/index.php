@@ -14,7 +14,7 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
-//DB::debugMode();
+DB::debugMode();
 
 if (true) {
     DB::$user = 'bootstore';
@@ -98,7 +98,8 @@ $app->get('/', function() use ($app, $log) {
 });
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
-$app->get('/scott/:criteria1/:criteria2/:criteria3', function(
+$app->get('/scot/:criteria1/:criteria2/:criteria3', function(
+
         $criteria1 = 'all',
         $criteria2 = 'null',
         $criteria3 = 'null') use ($app, $log) {
@@ -162,7 +163,9 @@ $app->post('/login', function() use ($app, $log) {
 
     if ($user && ($user['password'] == $password)) {
         $_SESSION['userId'] = $user['id'];
-        $app->render('index.html.twig');
+        $app->render('index.html.twig', array(
+            'userId' => $_SESSION['userId'],
+        ));
     } else {
         $app->render('login.html.twig', array('error' => true));
     }
@@ -172,7 +175,7 @@ $app->post('/login', function() use ($app, $log) {
 $app->get('/logout', function() use ($app, $log) {
     if ($_SESSION['userId']) {
         $_SESSION['userId'] = array();
-        $app->render('logout.html.twig');
+        $app->render('index.html.twig');
     } else {
         $log->addAlert('Unregistered user tried to LOGOUT');
         $app->render('index.html.twig');
@@ -183,23 +186,31 @@ $app->get('/logout', function() use ($app, $log) {
 $app->get('/cart', function() use ($app, $log) {
     if ($_SESSION['userId']) {
         $items = DB::query(""
-                        . "SELECT * "
-                        . "FROM cartitems "
-                        . "INNER JOIN items "
-                        . "ON cartitems.itemId=items.id "
-                        . "WHERE cartitems.userId=%s "
-                        . "ORDER BY cartitems.createdTS ASC", $_SESSION['userId']);
+                        . "SELECT "
+                        . "* FROM cartitems as c"
+//                        . "c.id AS 'id', i.title AS 'title', u.email  AS 'userEmail', c.createdTS  AS 'createdTS' "
+//                        . "FROM cartitems as c"
+//                        . "INNER JOIN items as i"
+//                        . "ON c.itemId=i.id "
+//                        . "INNER JOIN users as u"
+//                        . "ON c.userId=u.id "
+                        . "WHERE c.userId=%s "
+                        . "ORDER BY c.createdTS ASC", $_SESSION['userId']);
     } else {
         $items = DB::query(""
-                        . "SELECT * "
-                        . "FROM cartitems "
-                        . "INNER JOIN items "
-                        . "ON cartitems.itemId=items.id "
-                        . "WHERE cartitems.sessionId=%s "
-                        . "ORDER BY cartitems.createdTS ASC", $_SESSION['sessionId']);
+                        . "SELECT "
+                        . "* FROM cartitems as c"
+//                        . "c.id AS 'id', i.title AS 'title', u.email  AS 'userEmail', c.createdTS  AS 'createdTS' "
+//                        . "FROM cartitems as c"
+//                        . "INNER JOIN items as i"
+//                        . "ON c.itemId=i.id "
+//                        . "INNER JOIN users as u"
+//                        . "ON c.userId=u.id "
+                        . "WHERE c.sessionId=%s "
+                        . "ORDER BY c.createdTS ASC", $_SESSION['sessionId']);
     }
 
-    $app->render('cart.html.twig', array('items' => $items));
+    $app->render('cart.html.twig', array('cartitems' => $items));
 });
 // </editor-fold> 
 // <editor-fold desc="Transaction History Page">
@@ -290,10 +301,10 @@ $app->get('/register', function() use ($app, $log) {
 });
 // </editor-fold> 
 // <editor-fold desc="Registration Page (POST)">
-$app->get('/register', function() use ($app, $log) {
-    $email = $app->request()->post('title');
-    $password1 = $app->request()->post('description');
-    $password2 = $app->request()->post('author');
+$app->post('/register', function() use ($app, $log) {
+    $email = $app->request()->post('email');
+    $password1 = $app->request()->post('password1');
+    $password2 = $app->request()->post('password2');
 
     $errorList = array();
 
@@ -304,18 +315,19 @@ $app->get('/register', function() use ($app, $log) {
     if (!$errorList) {
         DB::insert('users', array(
             'email' => $email,
-            'password' => $password,
-            'isAdmin' => 0));
+            'password' => $password1
+        ));
 
         $_SESSION['userId'] = DB::insertId();
-        $app->render('login.html.twig');
+//        $app->render('login.html.twig');
+        $app->render('register.html.twig');
     } else {
         $app->render('register.html.twig', array('errors' => errorList));
     }
 });
 // </editor-fold> 
-// <editor-fold defaultstate="collapsed" desc="/item/addtocart/:id Page (POST)">
-$app->post('/item/addtocart/:itemId', function($itemId) use ($app, $log) {
+// <editor-fold esc="/cart/add/:id Page (POST)">
+$app->post('/cart/add/:itemId', function($itemId) use ($app, $log) {
 // validate parameters
     $item = DB::query("SELECT id FROM items WHERE id=%d", $itemId);
     if (!$item) {
@@ -327,24 +339,45 @@ $app->post('/item/addtocart/:itemId', function($itemId) use ($app, $log) {
 //        echo "Please login first.";
 //        return;
 //    }
-//TODO: use rollback();
-    DB::startTransaction();
+
     DB::insert('cartitems', array(
-        'userid' => 1,
+        'userid' => $_SESSION["userId"],
         'itemId' => $itemId,
         'sessionId' => $sessionID
     ));
-    $counter = DB::affectedRows();
-//    DB::delete('items', "id=%i", $itemId);
-    if ($counter == 1) {
-        echo $counter . " book added to the cart.";
-        DB::commit();
+    $id = DB::insertId();
+    $cartItem = DB::queryFirstColumn("SELECT * username FROM cartitems");
+
+    $app->render('cart_add_success.html', array(
+        'v' => $cartItem
+    ));
+});
+// <editor-fold desc="/cart/remove/:id Page (POST)">
+$app->post('/cart/remove/:id', function($id) use ($app, $log) {
+// validate parameters
+    $cartItem = DB::query("SELECT id FROM cartitems WHERE id=%d", $id);
+    if (!$cartItem) {
+        echo $id . " not found";
+        return;
+    }
+    $sessionID = session_id();
+//    if ($_SESSION['userId']) {
+//        echo "Please login first.";
+//        return;
+//    }
+    DB::delete('cartitems', "id=%i", '$id');
+    $cartItem = DB::query("SELECT id FROM cartitems WHERE id=%d", $id);
+    if ($cartItem) {
+        echo $itemId . "not deleted";
+        return;
     } else {
-        echo "No book added to the cart.\n";
-        DB::rollback();
+        echo $itemId . "deleted";
+        return;
     }
 
-    echo $itemId . 'add to cart successfully';
+//    $app->render('cart_delete_success.html', array(
+//        'id' => $itemId
+//    ));
 });
 // <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
 $app->get('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $log) {
@@ -581,6 +614,12 @@ $app->get('/item/:code/classStr', function($code) use ($app, $log) {
     var_dump($results);
     return;
     echo $restult;
+});
+
+// <editor-fold defaultstate="collapsed" desc="/isemailregistered">
+$app->get('/isemailregistered/:email', function($email) use ($app, $log) {
+    $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
+    echo ($user) ? "Email already in use." : "";
 });
 
 // <editor-fold defaultstate="collapsed" desc="Run /test (GET)">
