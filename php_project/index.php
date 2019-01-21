@@ -97,6 +97,24 @@ $app->get('/', function() use ($app, $log) {
     $app->render('index.html.twig', array('books' => $books));
 });
 // </editor-fold>
+// 
+// <editor-fold desc="/list/page/classid">
+$app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($app, $log) {
+    $pageSize = 5;
+    if (strlen($classCode) == 3) {
+        //TODO: jump pages
+        $books = DB::query("SELECT * FROM items where DeweyDecimalClass = $classCode");
+    } else {
+        $books = DB::query("SELECT * FROM items ");
+    }
+
+    $app->render('index.html.twig', array(
+        'books' => $books,
+        'page' => $page,
+        'DeweyDecimalClass' => $classCode
+    ));
+});
+// </editor-fold>
 // <editor-fold desc="Login Page">
 $app->get('/login', function() use ($app, $log) {
     //  No Check on userId needed, if user is already 
@@ -186,11 +204,11 @@ $app->get('/register', function() use ($app, $log) {
 });
 // </editor-fold> 
 // <editor-fold defaultstate="collapsed" desc="/item/addtocart/:id Page (POST)">
-$app->post('/item/addtocart/:id', function($id) use ($app, $log) {
+$app->post('/item/addtocart/:itemId', function($itemId) use ($app, $log) {
     // validate parameters
-    $item = DB::query("SELECT id FROM items WHERE id=%d", $id);
+    $item = DB::query("SELECT id FROM items WHERE id=%d", $itemId);
     if (!$item) {
-        echo $id . "not found";
+        echo $itemId . "not found";
         return;
     }
     $sessionID = session_id();
@@ -198,13 +216,24 @@ $app->post('/item/addtocart/:id', function($id) use ($app, $log) {
 //        echo "Please login first.";
 //        return;
 //    }
-
-
+//TODO: use rollback();
+    DB::startTransaction();
     DB::insert('cartitems', array(
         'userid' => 1,
-        'itemId' => $id,
+        'itemId' => $itemId,
         'sessionId' => $sessionID
     ));
+    $counter = DB::affectedRows();
+    DB::delete('items', "id=%i", $itemId);
+    if ($counter == 1) {
+        echo $counter . " book added to the cart.";
+        DB::commit();
+    } else {
+        echo "No book added to the cart.\n";
+        DB::rollback();
+    }
+
+
     echo $id . 'add to cart successfully';
 });
 // <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
