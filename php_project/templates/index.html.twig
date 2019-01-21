@@ -18,13 +18,27 @@
     <div>
         <h2>Welcome, your sessionID is {{sessionID}}</h2>
         {% for book in books %}
-            <div>
-                <br><b>{{book.title}}</b></br>
-                <br>{{book.author}}<br>            
-                <br>{{book.price}}<br>       
-                <br>{{book.ISBN}}<br>     
-                <img src="/item/{{book.id}}/image" width="200">
+
+            <div class="well">
+                {% if book.image != null %}
+                    <div class="pull-left" style="margin-right: 10px">
+                        <img class="img-thumbnail" width="75" height="75"
+                             src="/item/{{book.id}}/image" />
+                    </div>
+                {% endif %}
+                <h3>
+                    <strong><a href="/admin/item/edit/{{ book.id }}">{{book.title}}</a></strong>
+                    <span class="pull-right label label-primary">{{book.author}}</span>
+                    <span class="pull-right label label-primary">${{book.price}}</span>
+                </h3>
+                <form action='/item/addtocart/{{book.id}}' method='post' >
+                    <div class="pull-right">
+                        <input type="submit" class="btn btn-success" value="Add to cart" />
+                    </div>
+                </form>
             </div>
+
+
         {% endfor %}
     </div>
 
