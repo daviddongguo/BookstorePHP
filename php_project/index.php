@@ -16,7 +16,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
 DB::debugMode();
 
-if (false) {
+if (true) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
@@ -71,32 +71,21 @@ $twig = $app->view()->getEnvironment();
 $twig->addGlobal('global_userId', $_SESSION['userId']);
 $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
+
 // <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
     $sessionID = session_id();
 
-    //Get all todos from DB
+    //Get all books from DB
     $books = DB::query("SELECT * FROM items");
 
-    // -----------------debugging --------------------
-//    var_dump($sessionID); // debugging
-//    echo '<hr />';
-//    var_dump($books);
-//    echo '<hr />';
-    // -----------------debugging --------------------
-    //Pass todos to index HTML as array of todos
+    //Pass books to index HTML as array of todos
     $app->render('index.html.twig', array(
         'sessionID' => $sessionID,
         'books' => $books));
 });
 // </editor-fold>
-// <editor-fold desc="Index Page (GET)">
-$app->get('/', function() use ($app, $log) {
-    $books = DB::query("SELECT * FROM items");
 
-    $app->render('index.html.twig', array('books' => $books));
-});
-// </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
 $app->get('/:criteria1/:criteria2/:criteria3', function(
         $criteria1 = 'all', 
@@ -133,28 +122,11 @@ $app->get('/:criteria1/:criteria2/:criteria3', function(
     $app->render('index.html.twig', array('books' => $books));
 });
 // </editor-fold>
-// <editor-fold desc="Login Page (GET)">
-=======
-// 
-// <editor-fold desc="/list/page/classid">
-$app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($app, $log) {
-    $pageSize = 5;
-    if (strlen($classCode) == 3) {
-        //TODO: jump pages
-        $books = DB::query("SELECT * FROM items where DeweyDecimalClass = $classCode");
-    } else {
-        $books = DB::query("SELECT * FROM items ");
-    }
+        
+// <editor-fold desc="Login And Logout">
 
-    $app->render('index.html.twig', array(
-        'books' => $books,
-        'page' => $page,
-        'DeweyDecimalClass' => $classCode
-    ));
-});
-// </editor-fold>
 // <editor-fold desc="Login Page">
->>>>>>> 8536842622e9bdd798f92b831edaa86cad9fa0e7
+//>>>>>>> 8536842622e9bdd798f92b831edaa86cad9fa0e7
 $app->get('/login', function() use ($app, $log) {
     //  No Check on userId needed, if user is already 
     //  logged in they can change accounts by logging in.
@@ -189,6 +161,44 @@ $app->get('/logout', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
+// </editor-fold>
+// <editor-fold desc="Registration Page (GET)">
+$app->get('/register', function() use ($app, $log) {
+    //  No Check on userId needed, if user is already 
+    //  logged in they can register a new account.   
+    $app->render('register.html.twig');
+});
+// </editor-fold> 
+// <editor-fold desc="Registration Page (POST)">
+$app->get('/register', function() use ($app, $log) 
+{
+    $email = $app->request()->post('title');
+    $password1 = $app->request()->post('description');
+    $password2 = $app->request()->post('author');
+    
+    $errorList = array();
+    
+    //
+    //error checking    
+    //  
+    
+    if (!$errorList)
+    {
+        DB::insert('users', array(
+            'email' => $email,
+            'password' =>  $password,
+            'isAdmin' => 0));
+
+        $_SESSION['userId'] = DB::insertId();
+        $app->render('login.html.twig');
+    }
+    else 
+    {
+        $app->render('register.html.twig', array('errors' => errorList));
+    }
+});
+// </editor-fold> 
+        
 // <editor-fold desc="Cart Page">
 $app->get('/cart', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -296,45 +306,25 @@ $app->post('/sell', function() use ($app, $log)
     }   
 });
 // </editor-fold> 
-// <editor-fold desc="Registration Page (GET)">
-$app->get('/register', function() use ($app, $log) {
-    //  No Check on userId needed, if user is already 
-    //  logged in they can register a new account.   
-    $app->render('register.html.twig');
-});
-// </editor-fold> 
-// <editor-fold desc="Registration Page (POST)">
-$app->get('/register', function() use ($app, $log) 
-{
-    $email = $app->request()->post('title');
-    $password1 = $app->request()->post('description');
-    $password2 = $app->request()->post('author');
-    
-    $errorList = array();
-    
-    //
-    //error checking    
-    //  
-    
-    if (!$errorList)
-    {
-        DB::insert('users', array(
-            'email' => $email,
-            'password' =>  $password,
-            'isAdmin' => 0));
-
-        $_SESSION['userId'] = DB::insertId();
-        $app->render('login.html.twig');
+        
+// <editor-fold desc="Run /list/:classCode/:page">
+$app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($app, $log) {
+    $pageSize = 5;
+    if (strlen($classCode) == 3) {
+        //TODO: jump pages
+        $books = DB::query("SELECT * FROM items where DeweyDecimalClass = $classCode");
+    } else {
+        $books = DB::query("SELECT * FROM items ");
     }
-    else 
-    {
-        $app->render('register.html.twig', array('errors' => errorList));
-    }
+
+    $app->render('index.html.twig', array(
+        'books' => $books,
+        'page' => $page,
+        'DeweyDecimalClass' => $classCode
+    ));
 });
-// </editor-fold> 
-
-
-// <editor-fold defaultstate="collapsed" desc="/item/addtocart/:id Page (POST)">
+// </editor-fold>
+// <editor-fold desc="Run /item/addtocart/:id Page (POST)">
 $app->post('/item/addtocart/:itemId', function($itemId) use ($app, $log) {
     // validate parameters
     $item = DB::query("SELECT id FROM items WHERE id=%d", $itemId);
@@ -367,7 +357,8 @@ $app->post('/item/addtocart/:itemId', function($itemId) use ($app, $log) {
 
     echo $id . 'add to cart successfully';
 });
-// <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
+// </editor-fold> 
+// <editor-fold desc="Run /admin/item/:action(/:id) (GET POST)">
 $app->get('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $log) {
     // validate parameters
     if (($action == 'add' && $id != -1) || ($action == 'edit' && $id == -1)) {
@@ -519,7 +510,8 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
         $app->render('item_add_success.html.twig', array('itemId' => $itemId));
     }
 })->conditions(array('action' => '(add|edit)', 'id' => '[0-9]+'));
-// <editor-fold defaultstate="collapsed" desc="Run /item/:id/image (GET)">
+// </editor-fold> 
+// <editor-fold desc="Run /item/:id/image (GET)">
 $app->get('/item/:id/image', function($id) use ($app, $log) {
     $item = DB::queryFirstRow("SELECT mimeType, image FROM items WHERE id=%i", $id);
     if (!$item) {
@@ -532,7 +524,7 @@ $app->get('/item/:id/image', function($id) use ($app, $log) {
     $app->response()->header('Content-Type', $item['mimeType']);
     echo $item['image'];
 });
-
+// </editor-fold> 
 // <editor-fold defaultstate="collapsed" desc="Run /item/:code/class (GET)">
 $app->get('/item/:code/class', function($code) use ($app, $log) {
 
@@ -568,7 +560,8 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
         }
     }
 });
-// <editor-fold defaultstate="collapsed" desc="Run /item/:code/class (GET)">
+// </editor-fold> 
+// <editor-fold desc="Run /item/:code/classStr (GET)">
 $app->get('/item/:code/classStr', function($code) use ($app, $log) {
     $results = array();
     switch (strlen($code)) {
@@ -600,11 +593,12 @@ $app->get('/item/:code/classStr', function($code) use ($app, $log) {
     return;
     echo $restult;
 });
-
+// </editor-fold> 
 // <editor-fold defaultstate="collapsed" desc="Run /test (GET)">
 $app->get('/test', function() use ($app, $log) {
     var_dump($_SESSION);
 });
+// </editor-fold> 
 
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
