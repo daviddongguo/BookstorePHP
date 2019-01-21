@@ -90,18 +90,71 @@ $app->get('/', function() use ($app, $log) {
         'books' => $books));
 });
 // </editor-fold>
-// <editor-fold desc="Index Page">
+// <editor-fold desc="Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
     $books = DB::query("SELECT * FROM items");
 
     $app->render('index.html.twig', array('books' => $books));
 });
 // </editor-fold>
-// <editor-fold desc="Login Page">
+// <editor-fold desc="Index Page (with CRITERIA)">
+$app->get('/:criteria1/:criteria2/:criteria3', function(
+        $criteria1 = 'all', 
+        $criteria2 = 'null', 
+        $criteria3 = 'null') use ($app, $log) 
+{
+    switch ($criteria1)
+    {
+        case("all"):
+        {
+            $books = DB::query("SELECT * FROM items");
+        }
+        case("new"):
+        {
+            //Does nothing as the items have no timestamp
+            $books = DB::query("SELECT * FROM items");
+        }
+        case("below10"):
+        {
+            $books = DB::query("SELECT * FROM items WHERE price < 10.00");
+        }
+        case("greater99"):
+        {
+            $books = DB::query("SELECT * FROM items WHERE price > 99.99");
+        }
+        case("author"):
+        {
+            $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
+        }
+        
+        
+        //Need alot more...       
+    }    
+    $app->render('index.html.twig', array('books' => $books));
+});
+// </editor-fold>
+// <editor-fold desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
     //  No Check on userId needed, if user is already 
     //  logged in they can change accounts by logging in.
     $app->render('login.html.twig');
+// </editor-fold> 
+// <editor-fold desc="Login Page (POST)">
+$app->post('/login', function() use ($app, $log) 
+{
+    $email = $app->request()->post('email');
+    $password = $app->request()->post('password');
+    $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
+    
+    if ($user && ($user['password'] == $password)) 
+    {
+        $_SESSION['userId'] = $user['id'];
+        $app->render('index.html.twig');
+    }
+    else 
+    { 
+        $app->render('login.html.twig', array('error' => true));
+    }
 });
 // </editor-fold> 
 // <editor-fold desc="Logout Page">
@@ -168,7 +221,7 @@ $app->get('/sellhistory', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
-// <editor-fold desc="Sell Page">
+// <editor-fold desc="Sell Page (GET)">
 $app->get('/sell', function() use ($app, $log) {
     if ($_SESSION['userId']) {
         $app->render('sell.html.twig');
@@ -178,13 +231,88 @@ $app->get('/sell', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
-// <editor-fold desc="Registration Page">
+// <editor-fold desc="Sell Page (POST)">
+$app->post('/sell', function() use ($app, $log)
+{
+    $title = $app->request()->post('title');
+    $description = $app->request()->post('description');
+    $conditionofused = $app->request()->post('conditionofused');
+    $author = $app->request()->post('author');
+    $ISBN = $app->request()->post('ISBN');
+    $price = $app->request()->post('price');
+    $DeweyDecimalClass = $app->request()->post('DeweyDecimalClass');
+    $type1 = $app->request()->post('type1');
+    $type2 = $app->request()->post('type2');
+    $type3 = $app->request()->post('type3');
+
+    $imageDir = $app->request()->post('image');
+
+    $errorList = array();
+
+    if (!$errorList)
+    {
+        DB::insert('items', array(
+            'title' => $title,
+            'image' =>  $imageDir,
+            'description' => $description,
+            'conditionofused' => $conditionofused,
+            'author' => $author,
+            'ISBN' => $ISBN,
+            'price' => $price,
+            'DeweyDecimalClass' => $DeweyDecimalClass,
+            'type1' => $type1,
+            'isFrontPage' => 0,
+            'type2' => $type2,
+            'type3' => $type3,
+            'sellerId' => $_SESSION['userId']));    
+        
+        //Or go to the Item.html.twig for the newly added item?
+        $app->render('item_add_success.html.twig');
+    }
+    else 
+    {
+        $app->render('item_add_success.html.twig', array('errors' => errorList));
+    }   
+});
+// </editor-fold> 
+// <editor-fold desc="Registration Page (GET)">
 $app->get('/register', function() use ($app, $log) {
     //  No Check on userId needed, if user is already 
     //  logged in they can register a new account.   
     $app->render('register.html.twig');
 });
 // </editor-fold> 
+// <editor-fold desc="Registration Page (POST)">
+$app->get('/register', function() use ($app, $log) 
+{
+    $email = $app->request()->post('title');
+    $password1 = $app->request()->post('description');
+    $password2 = $app->request()->post('author');
+    
+    $errorList = array();
+    
+    //
+    //error checking    
+    //  
+    
+    if (!$errorList)
+    {
+        DB::insert('users', array(
+            'email' => $email,
+            'password' =>  $password,
+            'isAdmin' => 0));
+
+        $_SESSION['userId'] = DB::insertId();
+        $app->render('login.html.twig');
+    }
+    else 
+    {
+        $app->render('register.html.twig', array('errors' => errorList));
+    }
+});
+// </editor-fold> 
+
+
 // <editor-fold defaultstate="collapsed" desc="/item/addtocart/:id Page (POST)">
 $app->post('/item/addtocart/:id', function($id) use ($app, $log) {
     // validate parameters
