@@ -16,7 +16,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
 DB::debugMode();
 
-if (true) {
+if (false) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
@@ -62,11 +62,9 @@ $view->setTemplatesDirectory(dirname(__FILE__) . '/templates');
 if (!isset($_SESSION['userId'])) {
     $_SESSION['userId'] = array();
 }
-
 if (!isset($_SESSION['sessionId'])) {
     $_SESSION['sessionId'] = session_id();
 }
-
 $twig = $app->view()->getEnvironment();
 $twig->addGlobal('global_userId', $_SESSION['userId']);
 $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
@@ -94,7 +92,11 @@ $app->get('/', function() use ($app, $log) {
 $app->get('/', function() use ($app, $log) {
     $books = DB::query("SELECT * FROM items");
 
-    $app->render('index.html.twig', array('books' => $books));
+    $app->render('index.html.twig', array(
+        'sessionId' => $_SESSION['sessionId'],
+        'userId' => $_SESSION['userId'],
+        'books' => $books)
+    );
 });
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
@@ -162,7 +164,8 @@ $app->post('/login', function() use ($app, $log) {
     $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
 
     if ($user && ($user['password'] == $password)) {
-        $_SESSION['userId'] = $user['id'];
+        $_SESSION['userId'] = $user['id'];              // login by userId
+        $_SESSION['sessionId'] = session_id();          // and current sessionId
         $app->render('index.html.twig', array(
             'userId' => $_SESSION['userId'],
         ));
@@ -174,7 +177,8 @@ $app->post('/login', function() use ($app, $log) {
 // <editor-fold desc="Logout Page">
 $app->get('/logout', function() use ($app, $log) {
     if ($_SESSION['userId']) {
-        $_SESSION['userId'] = array();
+        $_SESSION['userId'] = array();              // destroy userId
+        $_SESSION['sessionId'] = array();           // and sessionId
         $app->render('index.html.twig');
     } else {
         $log->addAlert('Unregistered user tried to LOGOUT');
@@ -185,29 +189,27 @@ $app->get('/logout', function() use ($app, $log) {
 // <editor-fold desc="Cart Page">
 $app->get('/cart', function() use ($app, $log) {
     if ($_SESSION['userId']) {
+        $userID = $_SESSION['userId'];
         $items = DB::query(""
-                        . "SELECT "
-                        . "* FROM cartitems as c"
-//                        . "c.id AS 'id', i.title AS 'title', u.email  AS 'userEmail', c.createdTS  AS 'createdTS' "
-//                        . "FROM cartitems as c"
-//                        . "INNER JOIN items as i"
-//                        . "ON c.itemId=i.id "
-//                        . "INNER JOIN users as u"
-//                        . "ON c.userId=u.id "
-                        . "WHERE c.userId=%s "
-                        . "ORDER BY c.createdTS ASC", $_SESSION['userId']);
+                        . "SELECT c.id, u.email, i.title, c.createdTS "
+                        . "FROM cartitems AS c "
+                        . "INNER JOIN items As i "
+                        . "ON c.itemId=i.id "
+                        . "INNER JOIN users As u "
+                        . "ON c.userId=u.id "
+                        . "WHERE c.userID=%s "
+                        . "ORDER BY c.createdTS ASC", $userID
+        );
     } else {
         $items = DB::query(""
-                        . "SELECT "
-                        . "* FROM cartitems as c"
-//                        . "c.id AS 'id', i.title AS 'title', u.email  AS 'userEmail', c.createdTS  AS 'createdTS' "
-//                        . "FROM cartitems as c"
-//                        . "INNER JOIN items as i"
-//                        . "ON c.itemId=i.id "
-//                        . "INNER JOIN users as u"
-//                        . "ON c.userId=u.id "
+                        . "SELECT c.id, u.email, i.title, c.createdTS "
+                        . "FROM cartitems AS c "
+                        . "INNER JOIN items As i "
+                        . "ON c.itemId=i.id "
+                        . "INNER JOIN users As u "
+                        . "ON c.userId=u.id "
                         . "WHERE c.sessionId=%s "
-                        . "ORDER BY c.createdTS ASC", $_SESSION['sessionId']);
+                        . "ORDER BY c.createdTS ASC", session_id());
     }
 
     $app->render('cart.html.twig', array('cartitems' => $items));
@@ -326,7 +328,7 @@ $app->post('/register', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
-// <editor-fold esc="/cart/add/:id Page (POST)">
+// <editor-fold desc="Run /cart/add/:id Page (POST)">
 $app->post('/cart/add/:itemId', function($itemId) use ($app, $log) {
 // validate parameters
     $item = DB::query("SELECT id FROM items WHERE id=%d", $itemId);
@@ -334,25 +336,20 @@ $app->post('/cart/add/:itemId', function($itemId) use ($app, $log) {
         echo $itemId . "not found";
         return;
     }
-    $sessionID = session_id();
-//    if ($_SESSION['userId']) {
-//        echo "Please login first.";
-//        return;
-//    }
 
     DB::insert('cartitems', array(
-        'userid' => $_SESSION["userId"],
         'itemId' => $itemId,
-        'sessionId' => $sessionID
+        'userId' => $_SESSION['userId'],
+        'sessionId' => session_id()
     ));
     $id = DB::insertId();
-    $cartItem = DB::queryFirstColumn("SELECT * username FROM cartitems");
-
-    $app->render('cart_add_success.html', array(
+    $cartItem = DB::queryFirstRow("SELECT * FROM cartitems WHERE id=%i", $id);
+    $app->render('cart_add_success.html.twig', array(
         'v' => $cartItem
     ));
 });
-// <editor-fold desc="/cart/remove/:id Page (POST)">
+// </editor-fold> 
+// <editor-fold desc="Run /cart/remove/:id Page (POST)">
 $app->post('/cart/remove/:id', function($id) use ($app, $log) {
 // validate parameters
     $cartItem = DB::query("SELECT id FROM cartitems WHERE id=%d", $id);
@@ -360,26 +357,24 @@ $app->post('/cart/remove/:id', function($id) use ($app, $log) {
         echo $id . " not found";
         return;
     }
-    $sessionID = session_id();
-//    if ($_SESSION['userId']) {
-//        echo "Please login first.";
-//        return;
-//    }
-    DB::delete('cartitems', "id=%i", '$id');
-    $cartItem = DB::query("SELECT id FROM cartitems WHERE id=%d", $id);
-    if ($cartItem) {
-        echo $itemId . "not deleted";
-        return;
+    if ($_SESSION['userId']) {
+        DB::delete('cartitems', "id=%i AND userId=%i", $id, $_SESSION['userId']);
     } else {
-        echo $itemId . "deleted";
-        return;
+        DB::delete('cartitems', "id=%i AND sessionId=%i", $id, $_SESSION['sessionId']);
     }
 
-//    $app->render('cart_delete_success.html', array(
-//        'id' => $itemId
-//    ));
+    $cartItem = DB::query("SELECT id FROM cartitems WHERE id=%d", $id);
+    if ($cartItem) {
+        echo $id . " not deleted";
+        return;
+    } else {
+        $app->render('cart_remove_success.html.twig', array(
+            'id' => $id
+        ));
+    }
 });
-// <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
+// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="Run /admin/item/add Page (GET POST)">
 $app->get('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $log) {
 // validate parameters
     if (($action == 'add' && $id != -1) || ($action == 'edit' && $id == -1)) {
@@ -547,8 +542,8 @@ $app->get('/item/:id/image', function($id) use ($app, $log) {
     $app->response()->header('Content-Type', $item['mimeType']);
     echo $item['image'];
 });
-
-// <editor-fold defaultstate="collapsed" desc="Run /item/:code/class (GET)">
+// </editor-fold>
+// <editor-fold desc="Run /item/:code/class (GET)">
 $app->get('/item/:code/class', function($code) use ($app, $log) {
 
     switch (strlen($code)) {
@@ -583,7 +578,8 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
         }
     }
 });
-// <editor-fold defaultstate="collapsed" desc="Run /item/:code/class (GET)">
+// </editor-fold>
+// <editor-fold desc="Run /item/:code/classStr (GET)">
 $app->get('/item/:code/classStr', function($code) use ($app, $log) {
     $results = array();
     switch (strlen($code)) {
@@ -615,18 +611,18 @@ $app->get('/item/:code/classStr', function($code) use ($app, $log) {
     return;
     echo $restult;
 });
-
-// <editor-fold defaultstate="collapsed" desc="/isemailregistered">
+// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="Run /isemailregistered">
 $app->get('/isemailregistered/:email', function($email) use ($app, $log) {
     $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
     echo ($user) ? "Email already in use." : "";
 });
-
+// </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Run /test (GET)">
 $app->get('/test', function() use ($app, $log) {
     var_dump($_SESSION);
 });
-
+// </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
