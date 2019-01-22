@@ -115,6 +115,32 @@ $app->get('/list/:currentPage', function($currentPage = 1) use ($app, $log) {
     ));
 })->conditions(array('page' => '[0-9]+'));
 // </editor-fold>
+// // <editor-fold  desc="Run '/list/:currentPage/:bookClassCode">
+$app->get('/list/:currentPage/:bookClassCode', function($currentPage = 1, $bookClassCode = '000') use ($app, $log) {
+    $pagesize = 5;
+    $offsetItmes = ($pagesize * ($currentPage - 1));
+    // Books
+    DB::query("SELECT id FROM items");
+    $TotalItems = DB::count();
+    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+
+    $books = DB::query("SELECT * FROM items "
+            . " WHERE DeweyDecimalClass LIKE %s"
+            . " LIMIT $pagesize OFFSET $offsetItmes", substr($bookClassCode, 0, 1) . '%%');
+
+    // Fetch first grade of DeweyDecimalClass
+    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
+    $classCodes = DB::query($querStr);
+
+    $app->render('index.html.twig', array(
+        'DeweyDecimalClass' => $classCodes,
+        'totalpages' => $totalpages,
+        'currentPage' => $currentPage,
+        'currentBookClass' => $bookClassCode,
+        'books' => $books,
+    ));
+})->conditions(array('page' => '[0-9]+'));
+// </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
 
 /*
@@ -151,23 +177,6 @@ $app->get('/list/:currentPage', function($currentPage = 1) use ($app, $log) {
 
 
 
-// </editor-fold>
-// <editor-fold desc="/list/:page/:classCode">
-$app->get('/list/:page/:classCode', function($page = 1, $classCode = -1) use ($app, $log) {
-    $pageSize = 5;
-    if (strlen($classCode) == 3) {
-//TODO: jump pages
-        $books = DB::query("SELECT * FROM items where DeweyDecimalClass = $classCode");
-    } else {
-        $books = DB::query("SELECT * FROM items ");
-    }
-
-    $app->render('index.html.twig', array(
-        'books' => $books,
-        'page' => $page,
-        'DeweyDecimalClass' => $classCode
-    ));
-});
 // </editor-fold>
 // <editor-fold desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
