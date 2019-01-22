@@ -69,89 +69,117 @@ $twig = $app->view()->getEnvironment();
 $twig->addGlobal('global_userId', $_SESSION['userId']);
 $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
+// <editor-fold desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
-    $sessionID = session_id();
+    $pagesize = 5;
+    $page = 1;
+    $offsetItmes = ($pagesize * ($page - 1));
+    // Books
+    DB::query("SELECT * FROM items");
+    $TotalItems = DB::count();
+    $totalpages = (int) ($TotalItems / $pagesize) + 1;
 
-//Get all todos from DB
-    $books = DB::query("SELECT * FROM items");
+    $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
 
-// -----------------debugging --------------------
-//    var_dump($sessionID); // debugging
-//    echo '<hr />';
-//    var_dump($books);
-//    echo '<hr />';
-// -----------------debugging --------------------
-//Pass todos to index HTML as array of todos
+    // Fetch first grade of DeweyDecimalClass
+    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
+    $classCodes = DB::query($querStr);
+
     $app->render('index.html.twig', array(
-        'sessionID' => $sessionID,
-        'books' => $books));
+        'DeweyDecimalClass' => $classCodes,
+        'totalpages' => $totalpages,
+        'books' => $books,
+    ));
 });
 // </editor-fold>
-// <editor-fold desc="Index Page (GET)">
-$app->get('/', function() use ($app, $log) {
-    $books = DB::query("SELECT * FROM items");
+// <editor-fold  desc="Run /list/:page">
+$app->get('/list/:currentPage', function($currentPage = 1) use ($app, $log) {
+    $pagesize = 5;
+    $offsetItmes = ($pagesize * ($currentPage - 1));
+    // Books
+    DB::query("SELECT * FROM items");
+    $TotalItems = DB::count();
+    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+
+    $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
+
+    // Fetch first grade of DeweyDecimalClass
+    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
+    $classCodes = DB::query($querStr);
 
     $app->render('index.html.twig', array(
-        'sessionId' => $_SESSION['sessionId'],
-        'userId' => $_SESSION['userId'],
-        'books' => $books)
-    );
-});
+        'DeweyDecimalClass' => $classCodes,
+        'totalpages' => $totalpages,
+        'currentPage' => $currentPage,
+        'books' => $books,
+    ));
+})->conditions(array('page' => '[0-9]+'));
+// </editor-fold>
+// // <editor-fold  desc="Run '/list/:currentPage/:bookClassCode">
+$app->get('/list/:currentPage/:bookClassCode', function($currentPage = 1, $bookClassCode = '000') use ($app, $log) {
+    $pagesize = 5;
+    $offsetItmes = ($pagesize * ($currentPage - 1));
+    // Books
+    DB::query("SELECT id FROM items");
+    $TotalItems = DB::count();
+    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+
+    $books = DB::query("SELECT * FROM items "
+            . " WHERE DeweyDecimalClass LIKE %s"
+            . " LIMIT $pagesize OFFSET $offsetItmes", substr($bookClassCode, 0, 1) . '%%');
+
+    // Fetch first grade of DeweyDecimalClass
+    $querStr = "SELECT DISTINCT c.code, c.name "
+            . " FROM classes as c "
+            . " INNER JOIN items as i ON c.code=i.DeweyDecimalClass"
+            . " WHERE c.code LIKE '%00' ORDER BY code";
+    $classCodes = DB::query($querStr);
+
+    $app->render('index.html.twig', array(
+        'DeweyDecimalClass' => $classCodes,
+        'totalpages' => $totalpages,
+        'currentPage' => $currentPage,
+        'currentBookClass' => $bookClassCode,
+        'books' => $books,
+    ));
+})->conditions(array('page' => '[0-9]+'));
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
 
 /*
-$app->get('/scot/:criteria1/:criteria2/:criteria3', function(
+  $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
 
-        $criteria1 = 'all',
-        $criteria2 = 'null',
-        $criteria3 = 'null') use ($app, $log) {
-    switch ($criteria1) {
-        case("all"): {
-                $books = DB::query("SELECT * FROM items");
-            }
-        case("new"): {
-//Does nothing as the items have no timestamp
-                $books = DB::query("SELECT * FROM items");
-            }
-        case("below10"): {
-                $books = DB::query("SELECT * FROM items WHERE price < 10.00");
-            }
-        case("greater99"): {
-                $books = DB::query("SELECT * FROM items WHERE price > 99.99");
-            }
-        case("author"): {
-                $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
-            }
-
-
-//Need alot more...       
-    }
-    $app->render('index.html.twig', array('books' => $books));
-});
-*/
+  $criteria1 = 'all',
+  $criteria2 = 'null',
+  $criteria3 = 'null') use ($app, $log) {
+  switch ($criteria1) {
+  case("all"): {
+  $books = DB::query("SELECT * FROM items");
+  }
+  case("new"): {
+  //Does nothing as the items have no timestamp
+  $books = DB::query("SELECT * FROM items");
+  }
+  case("below10"): {
+  $books = DB::query("SELECT * FROM items WHERE price < 10.00");
+  }
+  case("greater99"): {
+  $books = DB::query("SELECT * FROM items WHERE price > 99.99");
+  }
+  case("author"): {
+  $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
+  }
 
 
+  //Need alot more...
+  }
+  $app->render('index.html.twig', array('books' => $books));
+  });
+ */
 
 
-// </editor-fold>
-// <editor-fold desc="/list/page/classid">
-$app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($app, $log) {
-    $pageSize = 5;
-    if (strlen($classCode) == 3) {
-//TODO: jump pages
-        $books = DB::query("SELECT * FROM items where DeweyDecimalClass = $classCode");
-    } else {
-        $books = DB::query("SELECT * FROM items ");
-    }
 
-    $app->render('index.html.twig', array(
-        'books' => $books,
-        'page' => $page,
-        'DeweyDecimalClass' => $classCode
-    ));
-});
+
 // </editor-fold>
 // <editor-fold desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
@@ -526,7 +554,7 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
             'image' => $imageData,
         ));
         $itemId = DB::insertId();
-        $app->render('item_add_success.html.twig', array('itemId' => $itemId));
+        $app->render('item_addedit_success.html.twig', array('itemId' => $itemId));
     }
 });
 //        ->conditions(array('action' => '(add|edit)', 'id' => '[0-9]+'));
