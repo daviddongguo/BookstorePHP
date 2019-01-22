@@ -129,7 +129,10 @@ $app->get('/list/:currentPage/:bookClassCode', function($currentPage = 1, $bookC
             . " LIMIT $pagesize OFFSET $offsetItmes", substr($bookClassCode, 0, 1) . '%%');
 
     // Fetch first grade of DeweyDecimalClass
-    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
+    $querStr = "SELECT DISTINCT c.code, c.name "
+            . " FROM classes as c "
+            . " INNER JOIN items as i ON c.code=i.DeweyDecimalClass"
+            . " WHERE c.code LIKE '%00' ORDER BY code";
     $classCodes = DB::query($querStr);
 
     $app->render('index.html.twig', array(
@@ -551,7 +554,7 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
             'image' => $imageData,
         ));
         $itemId = DB::insertId();
-        $app->render('item_add_success.html.twig', array('itemId' => $itemId));
+        $app->render('item_addedit_success.html.twig', array('itemId' => $itemId));
     }
 });
 //        ->conditions(array('action' => '(add|edit)', 'id' => '[0-9]+'));
