@@ -16,7 +16,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
 DB::debugMode();
 
-if (false) {
+if (true) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
@@ -100,6 +100,8 @@ $app->get('/', function() use ($app, $log) {
 });
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
+
+/*
 $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
 
         $criteria1 = 'all',
@@ -128,10 +130,12 @@ $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
     }
     $app->render('index.html.twig', array('books' => $books));
 });
+*/
+
+
+
+
 // </editor-fold>
-// <editor-fold desc="Login Page (GET)">
-//=======
-// 
 // <editor-fold desc="/list/page/classid">
 $app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($app, $log) {
     $pageSize = 5;
@@ -149,8 +153,7 @@ $app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($a
     ));
 });
 // </editor-fold>
-// <editor-fold desc="Login Page">
-//>>>>>>> 8536842622e9bdd798f92b831edaa86cad9fa0e7
+// <editor-fold desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
 //  No Check on userId needed, if user is already 
 //  logged in they can change accounts by logging in.
@@ -211,7 +214,6 @@ $app->get('/cart', function() use ($app, $log) {
                         . "WHERE c.sessionId=%s "
                         . "ORDER BY c.createdTS ASC", session_id());
     }
-
     $app->render('cart.html.twig', array('cartitems' => $items));
 });
 // </editor-fold> 
