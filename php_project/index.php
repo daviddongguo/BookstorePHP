@@ -74,9 +74,9 @@ $app->get('/', function() use ($app, $log) {
     $pagesize = 5;
     $currentPage = 1;
     $bookClassCode = 'xxx';
-    $offsetItmes = ($pagesize * ($page - 1));
+    $offsetItmes = ($pagesize * ($currentPage - 1));
     // Books
-    DB::query("SELECT * FROM items");
+    DB::query("SELECT id FROM items");
     $TotalItems = DB::count();
     $totalpages = (int) ($TotalItems / $pagesize) + 1;
 
@@ -95,57 +95,58 @@ $app->get('/', function() use ($app, $log) {
     ));
 });
 // </editor-fold>
-// <editor-fold  desc="Run /list/:page">
-$app->get('/list/:currentPage', function($currentPage = 1) use ($app, $log) {
+// // <editor-fold  desc="Run '/list/:currentPage/:currentBookClass">
+$app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $currentBookClass = 'xxx') use ($app, $log) {
     $pagesize = 5;
-    $offsetItmes = ($pagesize * ($currentPage - 1));
-    // Books
-    DB::query("SELECT * FROM items");
+
+    // Totalpages
+    if ($currentBookClass == 'xxx') {  // for all book classes
+        DB::query("SELECT id FROM items");
+    } else {
+        DB::query("SELECT id FROM items "
+                . " WHERE DeweyDecimalClass LIKE %s"
+                . " ", substr($currentBookClass, 0, 1) . '%%');
+    }
     $TotalItems = DB::count();
-    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+    $totalpages = (int) (($TotalItems - 1) / $pagesize) + 1;
+    if ($currentPage > $totalpages) {
+        $currentPage = $totalpages;
+    }
 
-    $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
-
-    // Fetch first grade of DeweyDecimalClass
-    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
-    $classCodes = DB::query($querStr);
-
-    $app->render('index.html.twig', array(
-        'DeweyDecimalClass' => $classCodes,
-        'totalpages' => $totalpages,
-        'currentPage' => $currentPage,
-        'books' => $books,
-    ));
-})->conditions(array('page' => '[0-9]+'));
-// </editor-fold>
-// // <editor-fold  desc="Run '/list/:currentPage/:bookClassCode">
-$app->get('/list/:currentPage/:bookClassCode', function($currentPage = 1, $bookClassCode = '000') use ($app, $log) {
-    $pagesize = 5;
     $offsetItmes = ($pagesize * ($currentPage - 1));
-    // Books
-    DB::query("SELECT id FROM items");
-    $TotalItems = DB::count();
-    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+    // Books List
+    if ($currentBookClass == 'xxx') {  // for all book classes
+        $booksList = DB::query("SELECT * FROM items "
+                        . " LIMIT $pagesize OFFSET $offsetItmes");
+    } else {
+        $booksList = DB::query("SELECT * FROM items "
+                        . " WHERE DeweyDecimalClass LIKE %s"
+                        . " LIMIT $pagesize OFFSET $offsetItmes", substr($currentBookClass, 0, 1) . '%%');
+    }
 
-    $books = DB::query("SELECT * FROM items "
-            . " WHERE DeweyDecimalClass LIKE %s"
-            . " LIMIT $pagesize OFFSET $offsetItmes", substr($bookClassCode, 0, 1) . '%%');
 
-    // Fetch first grade of DeweyDecimalClass
+
+    // DeweyDecimalClass
     $querStr = "SELECT DISTINCT c.code, c.name "
             . " FROM classes as c "
-            . " INNER JOIN items as i ON c.code=i.DeweyDecimalClass"
-            . " WHERE c.code LIKE '%00' ORDER BY code";
+            . " INNER JOIN items as i ON c.code=i.DeweyDecimalClass";
     $classCodes = DB::query($querStr);
 
+    // CurrentBookClass
+    if (is_numeric($currentBookClass) && strlen($currentBookClass) > 0) {
+        $currentBookClass = substr($currentBookClass, 0, 3);
+    } else {
+        $currentBookClass = 'xxx';
+    }
+    // Render
     $app->render('index.html.twig', array(
         'DeweyDecimalClass' => $classCodes,
         'totalpages' => $totalpages,
         'currentPage' => $currentPage,
-        'currentBookClass' => $bookClassCode,
-        'books' => $books,
+        'currentBookClass' => $currentBookClass,
+        'books' => $booksList,
     ));
-})->conditions(array('page' => '[0-9]+'));
+});
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
 

@@ -6,7 +6,7 @@
 
 {% block sideNav %}
     <h3>Side Nav</h3>  
-    {% if currentBookClass starts with 'xxx' %}
+    {% if currentBookClass == 'xxx' %}
         <a class="btn btn-outline-primary active" role="button" 
            href="/"><small>All</small>
         </a>
@@ -26,11 +26,6 @@
                href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>
             </a>
         {% endif %}
-
-
-        <a class="btn btn-outline-primary" role="button" 
-           href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>
-        </a>
 
     {% endfor %}        
 
