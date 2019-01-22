@@ -69,13 +69,17 @@ $twig = $app->view()->getEnvironment();
 $twig->addGlobal('global_userId', $_SESSION['userId']);
 $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
+// <editor-fold desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
-
+    $pagesize = 5;
+    $page = 1;
+    $offsetItmes = ($pagesize * ($page - 1));
     // Books
-    $books = DB::query("SELECT * FROM items");
+    DB::query("SELECT * FROM items");
     $TotalItems = DB::count();
-    $totalpages =(int)($TotalItems / 5) + 1;
+    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+
+    $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
 
     // Fetch first grade of DeweyDecimalClass
     $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
@@ -86,8 +90,29 @@ $app->get('/', function() use ($app, $log) {
         'totalpages' => $totalpages,
         'books' => $books,
     ));
-
 });
+// </editor-fold>
+// <editor-fold  desc="Run /list/:page">
+$app->get('/list/:page', function($page=1) use ($app, $log) {
+    $pagesize = 5;
+    $offsetItmes = ($pagesize * ($page - 1));
+    // Books
+    DB::query("SELECT * FROM items");
+    $TotalItems = DB::count();
+    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+
+    $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
+
+    // Fetch first grade of DeweyDecimalClass
+    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
+    $classCodes = DB::query($querStr);
+
+    $app->render('index.html.twig', array(
+        'DeweyDecimalClass' => $classCodes,
+        'totalpages' => $totalpages,
+        'books' => $books,
+    ));
+})->conditions(array('page' => '[0-9]+'));
 // </editor-fold>
 // <editor-fold desc="Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
