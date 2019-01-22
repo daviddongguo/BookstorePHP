@@ -18,7 +18,7 @@
     <body>
         <div class="container">
             <div class="row">
-                <div class="col-sm-12 col-md-7">
+                <div class="col-sm-10 col-md-7">
                     <div id='topNav'>
                         <ul class="nav">
                             <li class="nav-item">
@@ -43,19 +43,14 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" id="centeredContent">
                 <div class="col-md-3 hidden-sm">
-                    <div id="sideNav"><h2>Navigator</h2>
-                        <ur>
-                            <li>1</li>
-                            <li>1</li>
-                            <li>1</li>
-                            <li>1</li>
-                            <li>1</li>
-                        </ur>
+                    <div class="" id="sideNav">
+                        {% block sideNav %}
+                        {% endblock %}
                     </div>
                 </div>
-                <div id="centeredContent">
+                <div class="col-md-7">
 
                     <div id="mainContent">
                         {% block content %}

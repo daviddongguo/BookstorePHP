@@ -1,25 +1,45 @@
 {% extends "master.html.twig" %}
 
-
-
-
-
 {% block title %}
-    libEr
+    Index
 {% endblock %}
 
+{% block sideNav %}
+    <h3>Side Nav</h3>        
 
+    {% for item in DeweyDecimalClass %}
 
+        <a class="btn btn-outline-primary" role="button" 
+           href="/list/bookclass/{{ item.code }}"><small>{{ item.name }}</small>
+        </a>
 
+    {% endfor %}        
 
+{% endblock %}
 
 {% block content %}
-
     <div>
-        <h3>Welcome, your sessionId is {{ sessionId }}</h3>
-        <h3>Welcome, your userId is {{ userId }}</h3>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% for p in range(1, totalpages) %}
+                    <li class="page-item"><a class="page-link" href="#">{{ p }}</a>
+                    </li>
+                {% endfor %}
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div>
         {% for book in books %}
-
             <div class="well">
                 {% if book.image != null %}
                     <div class="pull-left" style="margin-right: 10px">
@@ -38,8 +58,6 @@
                     </div>
                 </form>
             </div>
-
-
         {% endfor %}
     </div>
 
