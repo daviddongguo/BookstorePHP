@@ -6,10 +6,27 @@
 
 {% block sideNav %}
     <h3>Side Nav</h3>  
-    <a class="btn btn-outline-primary" role="button" 
-       href="/"><small>All</small>
-    </a>
+    {% if currentBookClass starts with 'xxx' %}
+        <a class="btn btn-outline-primary active" role="button" 
+           href="/"><small>All</small>
+        </a>
+    {% else %}
+        <a class="btn btn-outline-primary" role="button" 
+           href="/"><small>All</small>
+        </a>
+    {% endif %}
     {% for item in DeweyDecimalClass %}
+
+        {% if currentBookClass == item.code %}
+            <a class="btn btn-outline-primary active" role="button" 
+               href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>
+            </a>
+        {% else %}
+            <a class="btn btn-outline-primary" role="button" 
+               href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>
+            </a>
+        {% endif %}
+
 
         <a class="btn btn-outline-primary" role="button" 
            href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>

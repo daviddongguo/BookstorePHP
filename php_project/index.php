@@ -72,7 +72,8 @@ $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // <editor-fold desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
     $pagesize = 5;
-    $page = 1;
+    $currentPage = 1;
+    $bookClassCode = 'xxx';
     $offsetItmes = ($pagesize * ($page - 1));
     // Books
     DB::query("SELECT * FROM items");
@@ -87,8 +88,9 @@ $app->get('/', function() use ($app, $log) {
 
     $app->render('index.html.twig', array(
         'DeweyDecimalClass' => $classCodes,
-        'currentPage' => $page,
         'totalpages' => $totalpages,
+        'currentPage' => $currentPage,
+        'currentBookClass' => $bookClassCode,
         'books' => $books,
     ));
 });
