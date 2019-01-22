@@ -71,28 +71,29 @@ $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
 // <editor-fold desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
-    $pagesize = 5;
-    $page = 1;
+     $pagesize = 5;
+     $page=1;
     $offsetItmes = ($pagesize * ($page - 1));
+    // Books
     DB::query("SELECT * FROM items");
+    $TotalItems = DB::count();
     $totalpages = (int) ($TotalItems / $pagesize) + 1;
 
     $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
 
-// -----------------debugging --------------------
-//    var_dump($sessionID); // debugging
-//    echo '<hr />';
-//    var_dump($books);
-//    echo '<hr />';
-// -----------------debugging --------------------
-//Pass todos to index HTML as array of todos
+    // Fetch first grade of DeweyDecimalClass
+    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
+    $classCodes = DB::query($querStr);
+
     $app->render('index.html.twig', array(
-        'sessionID' => $sessionID,
-        'books' => $books));
+        'DeweyDecimalClass' => $classCodes,
+        'totalpages' => $totalpages,
+        'books' => $books,
+    ));
 });
 // </editor-fold>
 // <editor-fold  desc="Run /list/:page">
-$app->get('/list/:page', function($page=1) use ($app, $log) {
+$app->get('/list/:page', function($page = 1) use ($app, $log) {
     $pagesize = 5;
     $offsetItmes = ($pagesize * ($page - 1));
     // Books
@@ -127,35 +128,35 @@ $app->get('/', function() use ($app, $log) {
 // <editor-fold desc="Index Page (with CRITERIA)">
 
 /*
-$app->get('/scot/:criteria1/:criteria2/:criteria3', function(
+  $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
 
-        $criteria1 = 'all',
-        $criteria2 = 'null',
-        $criteria3 = 'null') use ($app, $log) {
-    switch ($criteria1) {
-        case("all"): {
-                $books = DB::query("SELECT * FROM items");
-            }
-        case("new"): {
-//Does nothing as the items have no timestamp
-                $books = DB::query("SELECT * FROM items");
-            }
-        case("below10"): {
-                $books = DB::query("SELECT * FROM items WHERE price < 10.00");
-            }
-        case("greater99"): {
-                $books = DB::query("SELECT * FROM items WHERE price > 99.99");
-            }
-        case("author"): {
-                $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
-            }
+  $criteria1 = 'all',
+  $criteria2 = 'null',
+  $criteria3 = 'null') use ($app, $log) {
+  switch ($criteria1) {
+  case("all"): {
+  $books = DB::query("SELECT * FROM items");
+  }
+  case("new"): {
+  //Does nothing as the items have no timestamp
+  $books = DB::query("SELECT * FROM items");
+  }
+  case("below10"): {
+  $books = DB::query("SELECT * FROM items WHERE price < 10.00");
+  }
+  case("greater99"): {
+  $books = DB::query("SELECT * FROM items WHERE price > 99.99");
+  }
+  case("author"): {
+  $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
+  }
 
 
-//Need alot more...       
-    }
-    $app->render('index.html.twig', array('books' => $books));
-});
-*/
+  //Need alot more...
+  }
+  $app->render('index.html.twig', array('books' => $books));
+  });
+ */
 
 
 
