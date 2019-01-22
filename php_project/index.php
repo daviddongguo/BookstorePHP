@@ -16,7 +16,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
 DB::debugMode();
 
-if (false) {
+if (true) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
@@ -74,22 +74,21 @@ $app->get('/', function() use ($app, $log) {
     $pagesize = 5;
     $page = 1;
     $offsetItmes = ($pagesize * ($page - 1));
-    // Books
     DB::query("SELECT * FROM items");
-    $TotalItems = DB::count();
     $totalpages = (int) ($TotalItems / $pagesize) + 1;
 
     $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
 
-    // Fetch first grade of DeweyDecimalClass
-    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
-    $classCodes = DB::query($querStr);
-
+// -----------------debugging --------------------
+//    var_dump($sessionID); // debugging
+//    echo '<hr />';
+//    var_dump($books);
+//    echo '<hr />';
+// -----------------debugging --------------------
+//Pass todos to index HTML as array of todos
     $app->render('index.html.twig', array(
-        'DeweyDecimalClass' => $classCodes,
-        'totalpages' => $totalpages,
-        'books' => $books,
-    ));
+        'sessionID' => $sessionID,
+        'books' => $books));
 });
 // </editor-fold>
 // <editor-fold  desc="Run /list/:page">
@@ -126,6 +125,8 @@ $app->get('/', function() use ($app, $log) {
 });
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
+
+/*
 $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
 
         $criteria1 = 'all',
@@ -154,67 +155,11 @@ $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
     }
     $app->render('index.html.twig', array('books' => $books));
 });
-// </editor-fold>
-// <editor-fold desc="Login Page (GET)">
-//=======
-// 
-// <editor-fold desc="/list/class/:code">
-$app->get('/list/:criteria/:value/:page', function($criteria = 'bookclass', $value, $page = 1) use ($app, $log) {
-    $pageSize = 5;
-    switch ($criteria) {
-        case("all"): {
-                $books = DB::query("SELECT * FROM items");
-            }
-        case("new"): {
-//Does nothing as the items have no timestamp
-                $books = DB::query("SELECT * FROM items");
-            }
-        case("below10"): {
-                $books = DB::query("SELECT * FROM items WHERE price < 10.00");
-            }
-        case("greater99"): {
-                $books = DB::query("SELECT * FROM items WHERE price > 99.99");
-            }
-        case("author"): {
-                $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
-            }
-    }
+*/
 
 
-    if (strlen($classCode) == 3) {
-//TODO: jump pages
-        $books = DB::query("SELECT * FROM items where DeweyDecimalClass = $classCode");
-    } else {
-        $books = DB::query("SELECT * FROM items ");
-    }
 
-    // Fetch first grade of DeweyDecimalClass
-    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
-    $classCodes = DB::query($querStr);
 
-    $app->render('index.html.twig', array(
-        'books' => $books,
-        'page' => $page,
-        'DeweyDecimalClass' => $classCodes
-    ));
-})->conditions(array('criteria' => '(bookclass|author|user)', 'page' => '[0-9]+'));
-// </editor-fold>
-// <editor-fold desc="/list/class/:code">
-$app->get('"/list/class/:code', function($page = 1, $classCode = -1) use ($app, $log) {
-    $pageSize = 5;
-    if (strlen($classCode) == 3) {
-//TODO: jump pages
-        $books = DB::query("SELECT * FROM items where DeweyDecimalClass = $classCode");
-    } else {
-        $books = DB::query("SELECT * FROM items ");
-    }
-
-    $app->render('index.html.twig', array(
-        'books' => $books,
-        'page' => $page,
-        'DeweyDecimalClass' => $classCode
-    ));
-});
 // </editor-fold>
 // <editor-fold desc="/list/page/classid">
 $app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($app, $log) {
@@ -233,8 +178,7 @@ $app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($a
     ));
 });
 // </editor-fold>
-// <editor-fold desc="Login Page">
-//>>>>>>> 8536842622e9bdd798f92b831edaa86cad9fa0e7
+// <editor-fold desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
 //  No Check on userId needed, if user is already 
 //  logged in they can change accounts by logging in.
@@ -295,7 +239,6 @@ $app->get('/cart', function() use ($app, $log) {
                         . "WHERE c.sessionId=%s "
                         . "ORDER BY c.createdTS ASC", session_id());
     }
-
     $app->render('cart.html.twig', array('cartitems' => $items));
 });
 // </editor-fold> 

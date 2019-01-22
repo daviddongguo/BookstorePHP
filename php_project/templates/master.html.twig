@@ -10,6 +10,9 @@
 
         <link rel="stylesheet" href="/styles.css" />
         <link rel="stylesheet" href="/bootstrap-theme.css" />
+        
+        {% block extrastyles %}{% endblock %}
+        
         <title>{% block title %}{% endblock %} - libEr</title>
         {% block addhead %}{% endblock %}
     </head>

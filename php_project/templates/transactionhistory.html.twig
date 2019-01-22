@@ -2,9 +2,42 @@
 
 
 
+{% block title %}
+    Transaction History
+{% endblock %}
 
 
 
 
+{% block content %}
+    
+    
+<div class="container-fluid">
+      
+    <nav class="navbar navbar-inverse" data-spy="affix" data-offset-top="0">
+        <ul class="nav navbar-nav">
+    
+            {% if global_userId %}
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/cart">Cart</a></li>
+                <li><a href="/transactionhistory">Transaction History</a></li>
+                <li><a href="/sellhistory">Sale History</a></li>
+                <li><a href="/sell">Sell a Book</a></li>
+    
+            {% else %}
 
+                
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+                <li><a href="/cart">My Cart</a></li>
+            
+            {% endif %} 
+            
+        </ul>
+    </nav>    
+    
+   
+
+
+{% endblock content %}
 
