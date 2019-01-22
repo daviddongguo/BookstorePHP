@@ -3,6 +3,18 @@ DAILY SCRUM - EVERY DAY AT 9AM
 
 
 
+==============================2019/01/22   ========================================
+2019/01/22 Dongguo
+1. Done since the last scrum:
+- basically implement the pagination
+- basically implement the function: add book to bookstroe, add book to cart, remove book from cart 
+2. To do until next Scrum:
+- update the pagination.
+- continue to update other functions.
+3. Need assistance/figure things out
+- ...
+
+
 ==============================2019/01/21   ========================================
 
 2019/01/21 Scott
@@ -18,6 +30,19 @@ DAILY SCRUM - EVERY DAY AT 9AM
 3. Need assistance/figure things out
 - ...
 
+2019/01/21 Dongguo
+1. Done since the last scrum:
+- /add book to cart
+2. To do until next Scrum:
+- list all the books based on categoriy, page, author...
+
+
+==============================2019/01/20   ========================================
+2019/01/20 Dongguo
+1. Done since the last scrum:
+- finish adding book
+2. To do until next Scrum:
+- add book to cart
 
 ==============================2019/01/19   ========================================
 
@@ -42,7 +67,7 @@ Build Html modules for testing (item & index)
 - ...
 
 
-2019/01/18 Dongguo
+2019/01/19 Dongguo
 1. Done since the last scrum:
 - fetch information from the database with AJAX in add-item-page.
 - insert all data into classes table. 
@@ -108,7 +133,7 @@ Build Html modules for testing (item & index)
 - PHP-Spider?
 
 
-Dongguo
+2019/01/18 Dongguo
 1. Done since the last scrum:
 - add table named classes in database.
 - update the table items and users. 
