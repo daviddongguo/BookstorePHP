@@ -5,8 +5,10 @@
 {% endblock %}
 
 {% block sideNav %}
-    <h3>Side Nav</h3>        
-
+    <h3>Side Nav</h3>  
+    <a class="btn btn-outline-primary" role="button" 
+       href="/"><small>All</small>
+    </a>
     {% for item in DeweyDecimalClass %}
 
         <a class="btn btn-outline-primary" role="button" 
@@ -42,7 +44,7 @@
                     </li>
                 {% endif %}
             {% endfor %}
-            {% if currentPage < totalpages %}
+            {% if currentPage < totalpages -1 %}
                 <li class="page-item">
                     <a class="page-link" href="/list/{{ currentPage +1 }}/{{ currentBookClass }}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>

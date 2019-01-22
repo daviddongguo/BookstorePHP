@@ -14,7 +14,7 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
-DB::debugMode();
+//DB::debugMode();
 
 if (true) {
     DB::$user = 'bootstore';
@@ -87,6 +87,7 @@ $app->get('/', function() use ($app, $log) {
 
     $app->render('index.html.twig', array(
         'DeweyDecimalClass' => $classCodes,
+        'currentPage' => $page,
         'totalpages' => $totalpages,
         'books' => $books,
     ));
