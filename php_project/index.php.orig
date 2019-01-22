@@ -14,9 +14,9 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
-//DB::debugMode();
+DB::debugMode();
 
-if (false) {
+if (true) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
@@ -62,44 +62,93 @@ $view->setTemplatesDirectory(dirname(__FILE__) . '/templates');
 if (!isset($_SESSION['userId'])) {
     $_SESSION['userId'] = array();
 }
-
 if (!isset($_SESSION['sessionId'])) {
     $_SESSION['sessionId'] = session_id();
 }
-
 $twig = $app->view()->getEnvironment();
 $twig->addGlobal('global_userId', $_SESSION['userId']);
 $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
+// <editor-fold desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
+<<<<<<< HEAD
+    $pagesize = 5;
+    $page = 1;
+    $offsetItmes = ($pagesize * ($page - 1));
+    // Books
+    DB::query("SELECT * FROM items");
+    $TotalItems = DB::count();
+    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+
+    $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
+
+    // Fetch first grade of DeweyDecimalClass
+    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
+    $classCodes = DB::query($querStr);
+=======
     $sessionID = session_id();
 
-    //Get all todos from DB
+//Get all todos from DB
     $books = DB::query("SELECT * FROM items");
+>>>>>>> 06b2a127718ae6d8907b36176dbcb68dbf531f31
 
-    // -----------------debugging --------------------
+// -----------------debugging --------------------
 //    var_dump($sessionID); // debugging
 //    echo '<hr />';
 //    var_dump($books);
 //    echo '<hr />';
-    // -----------------debugging --------------------
-    //Pass todos to index HTML as array of todos
+// -----------------debugging --------------------
+//Pass todos to index HTML as array of todos
     $app->render('index.html.twig', array(
+<<<<<<< HEAD
+        'DeweyDecimalClass' => $classCodes,
+        'totalpages' => $totalpages,
+        'books' => $books,
+    ));
+=======
         'sessionID' => $sessionID,
         'books' => $books));
+>>>>>>> 06b2a127718ae6d8907b36176dbcb68dbf531f31
 });
+// </editor-fold>
+// <editor-fold  desc="Run /list/:page">
+$app->get('/list/:page', function($page=1) use ($app, $log) {
+    $pagesize = 5;
+    $offsetItmes = ($pagesize * ($page - 1));
+    // Books
+    DB::query("SELECT * FROM items");
+    $TotalItems = DB::count();
+    $totalpages = (int) ($TotalItems / $pagesize) + 1;
+
+    $books = DB::query("SELECT * FROM items LIMIT $pagesize OFFSET $offsetItmes ");
+
+    // Fetch first grade of DeweyDecimalClass
+    $querStr = "SELECT code, name FROM classes WHERE code LIKE '%00' ORDER BY code";
+    $classCodes = DB::query($querStr);
+
+    $app->render('index.html.twig', array(
+        'DeweyDecimalClass' => $classCodes,
+        'totalpages' => $totalpages,
+        'books' => $books,
+    ));
+})->conditions(array('page' => '[0-9]+'));
 // </editor-fold>
 // <editor-fold desc="Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
     $books = DB::query("SELECT * FROM items");
 
-    $app->render('index.html.twig', array('books' => $books));
+    $app->render('index.html.twig', array(
+        'sessionId' => $_SESSION['sessionId'],
+        'userId' => $_SESSION['userId'],
+        'books' => $books)
+    );
 });
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
-//<<<<<<< HEAD
-$app->get('scott/:criteria1/:criteria2/:criteria3', function(
+
+/*
+$app->get('/scot/:criteria1/:criteria2/:criteria3', function(
+
         $criteria1 = 'all',
         $criteria2 = 'null',
         $criteria3 = 'null') use ($app, $log) {
@@ -124,51 +173,19 @@ $app->get('scott/:criteria1/:criteria2/:criteria3', function(
 
 //Need alot more...       
     }
-//=======
-$app->get('/:criteria1/:criteria2/:criteria3', function(
-        $criteria1 = 'all', 
-        $criteria2 = 'null', 
-        $criteria3 = 'null') use ($app, $log) 
-{
-    switch ($criteria1)
-    {
-        case("all"):
-        {
-            $books = DB::query("SELECT * FROM items");
-        }
-        case("new"):
-        {
-            //Does nothing as the items have no timestamp
-            $books = DB::query("SELECT * FROM items");
-        }
-        case("below10"):
-        {
-            $books = DB::query("SELECT * FROM items WHERE price < 10.00");
-        }
-        case("greater99"):
-        {
-            $books = DB::query("SELECT * FROM items WHERE price > 99.99");
-        }
-        case("author"):
-        {
-            $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
-        }
-        
-        
-        //Need alot more...       
-    }    
->>>>>>> d1d4c74305841eebefd0098a9b3cf7866100087e
     $app->render('index.html.twig', array('books' => $books));
 });
+*/
+
+
+
+
 // </editor-fold>
-// <editor-fold desc="Login Page (GET)">
-=======
-// 
 // <editor-fold desc="/list/page/classid">
 $app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($app, $log) {
     $pageSize = 5;
     if (strlen($classCode) == 3) {
-        //TODO: jump pages
+//TODO: jump pages
         $books = DB::query("SELECT * FROM items where DeweyDecimalClass = $classCode");
     } else {
         $books = DB::query("SELECT * FROM items ");
@@ -181,27 +198,26 @@ $app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($a
     ));
 });
 // </editor-fold>
-// <editor-fold desc="Login Page">
->>>>>>> 8536842622e9bdd798f92b831edaa86cad9fa0e7
+// <editor-fold desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
-    //  No Check on userId needed, if user is already 
-    //  logged in they can change accounts by logging in.
+//  No Check on userId needed, if user is already 
+//  logged in they can change accounts by logging in.
     $app->render('login.html.twig');
+});
 // </editor-fold> 
 // <editor-fold desc="Login Page (POST)">
-$app->post('/login', function() use ($app, $log) 
-{
+$app->post('/login', function() use ($app, $log) {
     $email = $app->request()->post('email');
     $password = $app->request()->post('password');
     $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
-    
-    if ($user && ($user['password'] == $password)) 
-    {
-        $_SESSION['userId'] = $user['id'];
-        $app->render('index.html.twig');
-    }
-    else 
-    { 
+
+    if ($user && ($user['password'] == $password)) {
+        $_SESSION['userId'] = $user['id'];              // login by userId
+        $_SESSION['sessionId'] = session_id();          // and current sessionId
+        $app->render('index.html.twig', array(
+            'userId' => $_SESSION['userId'],
+        ));
+    } else {
         $app->render('login.html.twig', array('error' => true));
     }
 });
@@ -209,8 +225,9 @@ $app->post('/login', function() use ($app, $log)
 // <editor-fold desc="Logout Page">
 $app->get('/logout', function() use ($app, $log) {
     if ($_SESSION['userId']) {
-        $_SESSION['userId'] = array();
-        $app->render('logout.html.twig');
+        $_SESSION['userId'] = array();              // destroy userId
+        $_SESSION['sessionId'] = array();           // and sessionId
+        $app->render('index.html.twig');
     } else {
         $log->addAlert('Unregistered user tried to LOGOUT');
         $app->render('index.html.twig');
@@ -220,24 +237,29 @@ $app->get('/logout', function() use ($app, $log) {
 // <editor-fold desc="Cart Page">
 $app->get('/cart', function() use ($app, $log) {
     if ($_SESSION['userId']) {
+        $userID = $_SESSION['userId'];
         $items = DB::query(""
-                        . "SELECT * "
-                        . "FROM cartitems "
-                        . "INNER JOIN items "
-                        . "ON cartitems.itemId=items.id "
-                        . "WHERE cartitems.userId=%s "
-                        . "ORDER BY cartitems.createdTS ASC", $_SESSION['userId']);
+                        . "SELECT c.id, u.email, i.title, c.createdTS "
+                        . "FROM cartitems AS c "
+                        . "INNER JOIN items As i "
+                        . "ON c.itemId=i.id "
+                        . "INNER JOIN users As u "
+                        . "ON c.userId=u.id "
+                        . "WHERE c.userID=%s "
+                        . "ORDER BY c.createdTS ASC", $userID
+        );
     } else {
         $items = DB::query(""
-                        . "SELECT * "
-                        . "FROM cartitems "
-                        . "INNER JOIN items "
-                        . "ON cartitems.itemId=items.id "
-                        . "WHERE cartitems.sessionId=%s "
-                        . "ORDER BY cartitems.createdTS ASC", $_SESSION['sessionId']);
+                        . "SELECT c.id, u.email, i.title, c.createdTS "
+                        . "FROM cartitems AS c "
+                        . "INNER JOIN items As i "
+                        . "ON c.itemId=i.id "
+                        . "INNER JOIN users As u "
+                        . "ON c.userId=u.id "
+                        . "WHERE c.sessionId=%s "
+                        . "ORDER BY c.createdTS ASC", session_id());
     }
-
-    $app->render('cart.html.twig', array('items' => $items));
+    $app->render('cart.html.twig', array('cartitems' => $items));
 });
 // </editor-fold> 
 // <editor-fold desc="Transaction History Page">
@@ -249,9 +271,9 @@ $app->get('/transactionhistory', function() use ($app, $log) {
                         . "INNER JOIN orders "
                         . "ON orderitems.orderId=orders.id "
                         . "WHERE orders.userId=%s", $_SESSION['userId']);
-        //If we add a timestamp to the orders we can return the
-        //transacrion history in chroniclogical order with
-        //"ORDER BY orders.timestamp ASC"
+//If we add a timestamp to the orders we can return the
+//transacrion history in chroniclogical order with
+//"ORDER BY orders.timestamp ASC"
         $app->render('transactionhistory.html.twig', array('items' => $items));
     } else {
         $log->addAlert('Unregistered user tried to Access TRANSACTION HISTORY');
@@ -281,8 +303,7 @@ $app->get('/sell', function() use ($app, $log) {
 });
 // </editor-fold> 
 // <editor-fold desc="Sell Page (POST)">
-$app->post('/sell', function() use ($app, $log)
-{
+$app->post('/sell', function() use ($app, $log) {
     $title = $app->request()->post('title');
     $description = $app->request()->post('description');
     $conditionofused = $app->request()->post('conditionofused');
@@ -298,11 +319,10 @@ $app->post('/sell', function() use ($app, $log)
 
     $errorList = array();
 
-    if (!$errorList)
-    {
+    if (!$errorList) {
         DB::insert('items', array(
             'title' => $title,
-            'image' =>  $imageDir,
+            'image' => $imageDir,
             'description' => $description,
             'conditionofused' => $conditionofused,
             'author' => $author,
@@ -313,95 +333,102 @@ $app->post('/sell', function() use ($app, $log)
             'isFrontPage' => 0,
             'type2' => $type2,
             'type3' => $type3,
-            'sellerId' => $_SESSION['userId']));    
-        
-        //Or go to the Item.html.twig for the newly added item?
+            'sellerId' => $_SESSION['userId']));
+
+//Or go to the Item.html.twig for the newly added item?
         $app->render('item_add_success.html.twig');
-    }
-    else 
-    {
+    } else {
         $app->render('item_add_success.html.twig', array('errors' => errorList));
-    }   
+    }
 });
 // </editor-fold> 
 // <editor-fold desc="Registration Page (GET)">
 $app->get('/register', function() use ($app, $log) {
-    //  No Check on userId needed, if user is already 
-    //  logged in they can register a new account.   
+//  No Check on userId needed, if user is already 
+//  logged in they can register a new account.   
     $app->render('register.html.twig');
 });
 // </editor-fold> 
 // <editor-fold desc="Registration Page (POST)">
-$app->get('/register', function() use ($app, $log) 
-{
-    $email = $app->request()->post('title');
-    $password1 = $app->request()->post('description');
-    $password2 = $app->request()->post('author');
-    
+$app->post('/register', function() use ($app, $log) {
+    $email = $app->request()->post('email');
+    $password1 = $app->request()->post('password1');
+    $password2 = $app->request()->post('password2');
+
     $errorList = array();
-    
-    //
-    //error checking    
-    //  
-    
-    if (!$errorList)
-    {
+
+//
+//error checking    
+//  
+
+    if (!$errorList) {
         DB::insert('users', array(
             'email' => $email,
-            'password' =>  $password,
-            'isAdmin' => 0));
+            'password' => $password1
+        ));
 
         $_SESSION['userId'] = DB::insertId();
-        $app->render('login.html.twig');
-    }
-    else 
-    {
+//        $app->render('login.html.twig');
+        $app->render('register.html.twig');
+    } else {
         $app->render('register.html.twig', array('errors' => errorList));
     }
 });
 // </editor-fold> 
-
-
-// <editor-fold defaultstate="collapsed" desc="/item/addtocart/:id Page (POST)">
-$app->post('/item/addtocart/:itemId', function($itemId) use ($app, $log) {
-    // validate parameters
+// <editor-fold desc="Run /cart/add/:id Page (POST)">
+$app->post('/cart/add/:itemId', function($itemId) use ($app, $log) {
+// validate parameters
     $item = DB::query("SELECT id FROM items WHERE id=%d", $itemId);
     if (!$item) {
         echo $itemId . "not found";
         return;
     }
-    $sessionID = session_id();
-//    if ($_SESSION['userId']) {
-//        echo "Please login first.";
-//        return;
-//    }
-//TODO: use rollback();
-    DB::startTransaction();
+
     DB::insert('cartitems', array(
-        'userid' => 1,
         'itemId' => $itemId,
-        'sessionId' => $sessionID
+        'userId' => $_SESSION['userId'],
+        'sessionId' => session_id()
     ));
-    $counter = DB::affectedRows();
-//    DB::delete('items', "id=%i", $itemId);
-    if ($counter == 1) {
-        echo $counter . " book added to the cart.";
-        DB::commit();
+    $id = DB::insertId();
+    $cartItem = DB::queryFirstRow("SELECT * FROM cartitems WHERE id=%i", $id);
+    $app->render('cart_add_success.html.twig', array(
+        'v' => $cartItem
+    ));
+});
+// </editor-fold> 
+// <editor-fold desc="Run /cart/remove/:id Page (POST)">
+$app->post('/cart/remove/:id', function($id) use ($app, $log) {
+// validate parameters
+    $cartItem = DB::query("SELECT id FROM cartitems WHERE id=%d", $id);
+    if (!$cartItem) {
+        echo $id . " not found";
+        return;
+    }
+    if ($_SESSION['userId']) {
+        DB::delete('cartitems', "id=%i AND userId=%i", $id, $_SESSION['userId']);
     } else {
-        echo "No book added to the cart.\n";
-        DB::rollback();
+        DB::delete('cartitems', "id=%i AND sessionId=%i", $id, $_SESSION['sessionId']);
     }
 
-    echo $itemId . 'add to cart successfully';
+    $cartItem = DB::query("SELECT id FROM cartitems WHERE id=%d", $id);
+    if ($cartItem) {
+        echo $id . " not deleted";
+        return;
+    } else {
+        $app->render('cart_remove_success.html.twig', array(
+            'id' => $id
+        ));
+    }
 });
-// <editor-fold defaultstate="collapsed" desc="Run admin/item/add Page (GET POST)">
+// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="Run /admin/item/add Page (GET POST)">
 $app->get('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $log) {
-    // validate parameters
+// validate parameters
     if (($action == 'add' && $id != -1) || ($action == 'edit' && $id == -1)) {
         $app->notFound();
         return;
     }
-    // stage 1 get form
+// stage 1 get form
     if ($action == 'edit') {
         $item = DB::queryFirstRow("SELECT * FROM items WHERE id=%i", $id);
         if (!$item) {
@@ -422,7 +449,6 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
         $app->notFound();
         return;
     }
-<<<<<<< HEAD
 
 // -----------------debugging --------------------
 //    var_dump($_SESSION['user']);
@@ -432,16 +458,6 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
 //    echo '<hr />';
 // -----------------debugging --------------------
 // 
-=======
-    // -----------------debugging --------------------
-    var_dump($_SESSION['user']);
-    var_dump($_FILES);
-    echo '<hr />';
-    var_dump($_POST);
-    echo '<hr />';
-    // -----------------debugging --------------------
-    // 
->>>>>>> d1d4c74305841eebefd0098a9b3cf7866100087e
     $id = $app->request()->post('id');
     $title = $app->request()->post('title');
     $author = $app->request()->post('author');
@@ -465,7 +481,7 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
         'mimeType' => $mimeType
     );
 
-    //
+//
     $errorList = array();
     if (strlen($title) < 2 || strlen($title) > 200) {
         array_push($errorList, "Title($title) must be 2-200 characters long");
@@ -490,7 +506,7 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
     }
 
 
-    // 
+// 
     if ($_FILES['image']['size'] == 0) {
         array_push($errorList, "Image is empty");
     } else {
@@ -499,30 +515,30 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
         if (!$imageInfo) {
             array_push($errorList, "File does not look like a valid image");
         } else {
-            // never allow '..' in the file name
+// never allow '..' in the file name
             if (strstr($image['name'], '..')) {
                 array_push($errorList, "File name invalid");
             }
-            // only allow select extensions
+// only allow select extensions
             $ext = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
             if (!in_array($ext, array('jpg', 'jpeg', 'gif', 'png'))) {
                 array_push($errorList, "File extension invalid");
             }
-            // check mime-type submitted
-            //$mimeType = $image['type']; // TODO: use getimagesize result mime-type instead
+// check mime-type submitted
+//$mimeType = $image['type']; // TODO: use getimagesize result mime-type instead
             $mimeType = $imageInfo['mime'];
             if (!in_array($mimeType, array('image/gif', 'image/jpeg', 'image/jpg', 'image/png'))) {
                 array_push($errorList, "File type invalid");
             }
 
-            // 
+// 
             $imageData = file_get_contents($image['tmp_name']);
             $valueList['image'] = $imageData;
             $valueList['mimeType'] = $mimeType;
         }
     }
 
-    //
+//
     if ($errorList) {
         $app->render('item_addedit.html.twig', array(
             'v' => $valueList, 'errorList' => $errorList));
@@ -557,15 +573,10 @@ $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $
         $itemId = DB::insertId();
         $app->render('item_add_success.html.twig', array('itemId' => $itemId));
     }
-<<<<<<< HEAD
 });
 //        ->conditions(array('action' => '(add|edit)', 'id' => '[0-9]+'));
 // </editor-fold> 
 // <editor-fold desc="Run /item/:id/image (GET)">
-=======
-})->conditions(array('action' => '(add|edit)', 'id' => '[0-9]+'));
-// <editor-fold defaultstate="collapsed" desc="Run /item/:id/image (GET)">
->>>>>>> d1d4c74305841eebefd0098a9b3cf7866100087e
 $app->get('/item/:id/image', function($id) use ($app, $log) {
     $item = DB::queryFirstRow("SELECT mimeType, image FROM items WHERE id=%i", $id);
     if (!$item) {
@@ -578,8 +589,8 @@ $app->get('/item/:id/image', function($id) use ($app, $log) {
     $app->response()->header('Content-Type', $item['mimeType']);
     echo $item['image'];
 });
-
-// <editor-fold defaultstate="collapsed" desc="Run /item/:code/class (GET)">
+// </editor-fold>
+// <editor-fold desc="Run /item/:code/class (GET)">
 $app->get('/item/:code/class', function($code) use ($app, $log) {
 
     switch (strlen($code)) {
@@ -600,7 +611,7 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
             break;
     }
 //    var_dump($results);
-    // <option value="{{ c.code }}">{{ c.name }}</option>
+// <option value="{{ c.code }}">{{ c.name }}</option>
     $isFirstOption = true;
     foreach ($results as $row) {
         if ($isFirstOption) {
@@ -614,7 +625,8 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
         }
     }
 });
-// <editor-fold defaultstate="collapsed" desc="Run /item/:code/class (GET)">
+// </editor-fold>
+// <editor-fold desc="Run /item/:code/classStr (GET)">
 $app->get('/item/:code/classStr', function($code) use ($app, $log) {
     $results = array();
     switch (strlen($code)) {
@@ -646,12 +658,18 @@ $app->get('/item/:code/classStr', function($code) use ($app, $log) {
     return;
     echo $restult;
 });
-
+// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="Run /isemailregistered">
+$app->get('/isemailregistered/:email', function($email) use ($app, $log) {
+    $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
+    echo ($user) ? "Email already in use." : "";
+});
+// </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Run /test (GET)">
 $app->get('/test', function() use ($app, $log) {
     var_dump($_SESSION);
 });
-
+// </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
