@@ -71,8 +71,8 @@ $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
 // <editor-fold desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
-     $pagesize = 5;
-     $page=1;
+    $pagesize = 5;
+    $page = 1;
     $offsetItmes = ($pagesize * ($page - 1));
     // Books
     DB::query("SELECT * FROM items");
@@ -93,9 +93,9 @@ $app->get('/', function() use ($app, $log) {
 });
 // </editor-fold>
 // <editor-fold  desc="Run /list/:page">
-$app->get('/list/:page', function($page = 1) use ($app, $log) {
+$app->get('/list/:currentPage', function($currentPage = 1) use ($app, $log) {
     $pagesize = 5;
-    $offsetItmes = ($pagesize * ($page - 1));
+    $offsetItmes = ($pagesize * ($currentPage - 1));
     // Books
     DB::query("SELECT * FROM items");
     $TotalItems = DB::count();
@@ -110,20 +110,10 @@ $app->get('/list/:page', function($page = 1) use ($app, $log) {
     $app->render('index.html.twig', array(
         'DeweyDecimalClass' => $classCodes,
         'totalpages' => $totalpages,
+        'currentPage' => $currentPage,
         'books' => $books,
     ));
 })->conditions(array('page' => '[0-9]+'));
-// </editor-fold>
-// <editor-fold desc="Index Page (GET)">
-$app->get('/', function() use ($app, $log) {
-    $books = DB::query("SELECT * FROM items");
-
-    $app->render('index.html.twig', array(
-        'sessionId' => $_SESSION['sessionId'],
-        'userId' => $_SESSION['userId'],
-        'books' => $books)
-    );
-});
 // </editor-fold>
 // <editor-fold desc="Index Page (with CRITERIA)">
 
@@ -162,8 +152,8 @@ $app->get('/', function() use ($app, $log) {
 
 
 // </editor-fold>
-// <editor-fold desc="/list/page/classid">
-$app->get('/list/:classCode/:page', function($page = 1, $classCode = -1) use ($app, $log) {
+// <editor-fold desc="/list/:page/:classCode">
+$app->get('/list/:page/:classCode', function($page = 1, $classCode = -1) use ($app, $log) {
     $pageSize = 5;
     if (strlen($classCode) == 3) {
 //TODO: jump pages
