@@ -74,7 +74,8 @@
                 <legend class="col-form-label col-sm-5 pt-0">
                     Dewey Decimal Classification
                     <input type="text" id="bookclass"  name="bookclass" 
-                           value='{{ v.DeweyDecimalClass }}' onkeyup="addSecondOption(this.value)">
+                           value='{{ v.DeweyDecimalClass }}'><br />
+                    <span id ="bookclassTaken-1"></span>
                 </legend>
 
                 <select class="custom-select my-1 mr-sm-2" onchange="addSecondOption(this.value)"
@@ -130,6 +131,13 @@
         function showVal(newVal) {
             document.getElementById("conditionValue").innerHTML = newVal;
         }
+
+        $(document).ready(function () {
+            $("input[name=bookclass]").keyup(function () {
+                var bookClassCode = $("input[name=bookclass]").val();
+                $("#bookclassTaken-1").load("/item/" + bookClassCode + "/classStr");
+            });
+        });
 
         // Fetch default data from data 
         $(document).ready(function () {
