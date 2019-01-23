@@ -197,13 +197,16 @@ $app->post('/login', function() use ($app, $log) {
     $email = $app->request()->post('email');
     $password = $app->request()->post('password');
     $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
-
+    
     if ($user && ($user['password'] == $password)) {
         $_SESSION['userId'] = $user['id'];              // login by userId
         $_SESSION['sessionId'] = session_id();          // and current sessionId
-        $app->render('index.html.twig', array(
-            'userId' => $_SESSION['userId'],
-        ));
+        
+        //$app->render('index.html.twig', array('userId' => $_SESSION['userId']));
+        
+        $app->redirect('/');
+        
+        
     } else {
         $app->render('login.html.twig', array('error' => true));
     }
@@ -214,10 +217,10 @@ $app->get('/logout', function() use ($app, $log) {
     if ($_SESSION['userId']) {
         $_SESSION['userId'] = array();              // destroy userId
         $_SESSION['sessionId'] = array();           // and sessionId
-        $app->render('index.html.twig');
+        $app->render('logout.html.twig');
     } else {
         $log->addAlert('Unregistered user tried to LOGOUT');
-        $app->render('index.html.twig');
+        $app->redirect('/');
     }
 });
 // </editor-fold> 
@@ -329,6 +332,8 @@ $app->post('/sell', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
+
+
 // <editor-fold desc="Registration Page (GET)">
 $app->get('/register', function() use ($app, $log) {
 //  No Check on userId needed, if user is already 
@@ -336,29 +341,62 @@ $app->get('/register', function() use ($app, $log) {
     $app->render('register.html.twig');
 });
 // </editor-fold> 
+
+
 // <editor-fold desc="Registration Page (POST)">
 $app->post('/register', function() use ($app, $log) {
     $email = $app->request()->post('email');
     $password1 = $app->request()->post('password1');
     $password2 = $app->request()->post('password2');
-
+    $values = array(
+        'email'=> $email, 
+        'password1' => $password1, 
+        'password1' => $password2);
     $errorList = array();
+    
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+    {
+        unset($values['email']);
+        unset($values['password1']);
+        unset($values['password2']);
+        array_push($errorList, "The provided E-mail address is invalid");
+    }    
 
-//
-//error checking    
-//  
+    if (DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email))
+    {
+        unset($values['password1']);
+        unset($values['password2']);
+        array_push($errorList, "This E-mail address is already in user");   
+    } 
+    
+    if (strlen($password1) < 6)
+    {
+        unset($values['password1']);
+        unset($values['password2']);
+        array_push($errorList, "Passwords must be six characters or longer");
+    }
+        
+    if ($password1 != $password2)
+    {
+        unset($values['password1']);
+        unset($values['password2']);
+        array_push($errorList, "Your passwords do not match");
+    }     
 
-    if (!$errorList) {
+    if (!$errorList) 
+    {
         DB::insert('users', array(
             'email' => $email,
             'password' => $password1
         ));
 
         $_SESSION['userId'] = DB::insertId();
-//        $app->render('login.html.twig');
-        $app->render('login.html.twig');
-    } else {
-        $app->render('register.html.twig', array('errors' => errorList));
+        
+        $app->render('registration_successful.html.twig');
+    } 
+    else 
+    {
+        $app->render('register.html.twig', array('errorList' => $errorList, 'values' => $values));
     }
 });
 // </editor-fold> 

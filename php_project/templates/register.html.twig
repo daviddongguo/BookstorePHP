@@ -13,15 +13,15 @@
         <ul class="error">
             {% for error in errorList %}
                 <li>{{error}}</li>
-                {% endfor %}
+            {% endfor %}
         </ul>
     {% endif %}
 
     <form method="post">
-        Email: <input type="email" name="email" value={{v.email}}><br />
+        Email: <input type="email" name="email" value={{values.email}}><br />
         <span id="emailTaken" class="error"></span><br>
-        Password:  <input type="password" name="password1" value="Ja1Ja1Ja1"><br />
-        Password(repeated):  <input type="password" name="password2" value="Ja1Ja1Ja1"><br />
+        Password:  <input type="password" name="password1" value=""><br />
+        Password(repeated):  <input type="password" name="password2" value=""><br />
         <input type="submit" value="Register">
     </form>
 
