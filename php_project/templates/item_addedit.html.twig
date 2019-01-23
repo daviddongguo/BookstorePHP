@@ -96,8 +96,12 @@
                 <input type="file" name="image" onchange="loadFile(event)" 
                        class=" col-sm-2 form-control-file" id="imageFormControlFile">
                 <img class="col-sm-4 rounded float-left" height="200" 
-                     src="/item/{{v.id}}/image"
-                     id="preview" alt="The preview of an image of this book.">
+                     {% if v.id %}
+                         src="/item/{{v.id}}/image"
+                         id="preview" alt="The preview of an image of this book."
+                     {% endif %}
+                     >
+
             </div>
         </fieldset>
         <div class="form-group">
