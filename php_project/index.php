@@ -679,9 +679,11 @@ $app->get('/item/:code/classStr', function($code) use ($app, $log) {
             array_push($results, DB::query($querStr));
             break;
     }
-    var_dump($results);
-    return;
-    echo $restult;
+//    var_dump($results);
+//    return;
+    echo '<p>' . $results[0][0]['name'] . '</p>';
+    echo '<p>' . $results[1][0]['name'] . '</p>';
+    echo '<p>' . $results[2][0]['name'] . '</p>';
 });
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Run /isemailregistered">
