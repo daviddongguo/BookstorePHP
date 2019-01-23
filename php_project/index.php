@@ -356,7 +356,7 @@ $app->post('/register', function() use ($app, $log) {
 
         $_SESSION['userId'] = DB::insertId();
 //        $app->render('login.html.twig');
-        $app->render('register.html.twig');
+        $app->render('login.html.twig');
     } else {
         $app->render('register.html.twig', array('errors' => errorList));
     }
