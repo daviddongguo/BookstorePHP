@@ -11,6 +11,7 @@ body {
     padding: 20px;
     width: 720px; 
     background-color: white;
+    opacity: 1.0;
 }
 
 .error {
@@ -18,3 +19,12 @@ body {
     background-color: yellow;
     color: red;
 }
+
+
+body {
+  background-image: url("library.png");
+  opacity: 0.85;
+  background-repeat: no-repeat;
+  background-size: cover;  
+} 
+

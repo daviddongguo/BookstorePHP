@@ -12,6 +12,17 @@
             border-radius: 50px;
             height: 100%;
             width: 100%;
+            position: relative;
+        }
+
+        .card a 
+        {
+            position: absolute;
+            top: 20%;
+            left: 5%;
+            bottom: -50%;
+            right: 0%;
+            margin: auto auto;
         }
      
         .card:hover {  box-shadow: 0 18px 26px 0 rgba(0,0,0,0.2); }
@@ -49,11 +60,13 @@
             <div class="row">
                 <div class="col-sm-4">
                     <div class="card">
-                        <img width="190px" src="{{ book.image }}" alt="Book">
+                        <a href="item/edit/{{ book.id }}">
+                            <img width="90px" src="/item/{{book.id}}/image" alt="Book">
+                        </a>
                     </div>
                 </div>
 
-                <div class="col-sm-6">
+                <div class="col-sm-3">
                     <div>
                         <h3>{{ book.title }}</h3>
                         <h3>{{ book.author }}</h3>
@@ -62,7 +75,7 @@
                     </div>
                 </div>
 
-                <div style="font-size:20px" class="col-sm-4">
+                <div style="font-size:20px" class="col-sm-3">
                     <b >{{ book.price }}</b>
                     <br><br>
                     <button><a href="item/edit/{{ book.id }}">Edit</a></button>
