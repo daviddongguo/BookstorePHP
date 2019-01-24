@@ -69,6 +69,8 @@ $twig = $app->view()->getEnvironment();
 $twig->addGlobal('global_userId', $_SESSION['userId']);
 $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
+
+
 // <editor-fold desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
     $pagesize = 5;
@@ -95,6 +97,9 @@ $app->get('/', function() use ($app, $log) {
     ));
 });
 // </editor-fold>
+
+
+
 // // <editor-fold  desc="Run '/list/:currentPage/:currentBookClass">
 $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $currentBookClass = 'xxx') use ($app, $log) {
     $pagesize = 5;
@@ -148,6 +153,10 @@ $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $cu
     ));
 });
 // </editor-fold>
+
+
+
+
 // <editor-fold desc="Index Page (with CRITERIA)">
 
 /*
@@ -185,6 +194,11 @@ $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $cu
 
 
 // </editor-fold>
+
+
+
+
+
 // <editor-fold desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
 //  No Check on userId needed, if user is already 
@@ -212,6 +226,11 @@ $app->post('/login', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
+
+
+
+
+
 // <editor-fold desc="Logout Page">
 $app->get('/logout', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -252,6 +271,12 @@ $app->get('/cart', function() use ($app, $log) {
     $app->render('cart.html.twig', array('cartitems' => $items));
 });
 // </editor-fold> 
+
+
+
+
+
+
 // <editor-fold desc="Transaction History Page">
 $app->get('/transactionhistory', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -271,17 +296,32 @@ $app->get('/transactionhistory', function() use ($app, $log) {
     }
 });
 // </editor-fold>
+
+
+
+
+
+
 // <editor-fold desc="Sell History Page">
-$app->get('/sellhistory', function() use ($app, $log) {
-    if ($_SESSION['userId']) {
+$app->get('/sellhistory', function() use ($app, $log) {  
+    
+    if ($_SESSION['userId'])
+    {
         $items = DB::query("SELECT * FROM items WHERE sellerId=%s", $_SESSION['userId']);
         $app->render('sellhistory.html.twig', array('items' => $items));
-    } else {
+    } 
+    else
+    {
         $log->addAlert('Unregistered user tried to Access SALES HISTORY');
-        $app->render('index.html.twig');
+        $app->redirect('/');
     }
 });
 // </editor-fold> 
+
+
+
+
+
 // <editor-fold desc="Sell Page (GET)">
 $app->get('/sell', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -292,6 +332,11 @@ $app->get('/sell', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
+
+
+
+
+
 // <editor-fold desc="Sell Page (POST)">
 $app->post('/sell', function() use ($app, $log) {
     $title = $app->request()->post('title');
@@ -400,6 +445,12 @@ $app->post('/register', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
+
+
+
+
+
+
 // <editor-fold desc="Run /cart/add/:id Page (POST)">
 $app->post('/cart/add/:itemId', function($itemId) use ($app, $log) {
 // validate parameters
