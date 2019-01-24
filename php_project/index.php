@@ -153,11 +153,8 @@ $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $cu
     ));
 });
 // </editor-fold>
-
-
-
-
 // <editor-fold desc="Index Page (with CRITERIA)">
+// </editor-fold>
 
 /*
   $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
@@ -189,14 +186,6 @@ $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $cu
   $app->render('index.html.twig', array('books' => $books));
   });
  */
-
-
-
-
-// </editor-fold>
-
-
-
 
 
 // <editor-fold desc="Login Page (GET)">
@@ -454,8 +443,8 @@ $app->post('/register', function() use ($app, $log) {
 // <editor-fold desc="Run /cart/add/:id Page (POST)">
 $app->post('/cart/add/:itemId', function($itemId) use ($app, $log) {
 // validate parameters
-    $item = DB::query("SELECT id FROM items WHERE id=%d", $itemId);
-    if (!$item) {
+    $existing = DB::query("SELECT id FROM items WHERE id=%d", $itemId);
+    if (!$existing) {
         echo $itemId . "not found";
         return;
     }
