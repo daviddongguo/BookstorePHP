@@ -1,6 +1,15 @@
 DAILY SCRUM - EVERY DAY AT 9AM
 ==============================
 
+==============================2019/01/24   ========================================
+2019/01/24 Dongguo
+1. Done since the last scrum:
+- found some bug
+2. To do until next Scrum:
+- Test all Pages and functiong
+3. Need assistance/figure things out
+- summary the project
+
 ==============================2019/01/23   ========================================
 2019/01/23 Dongguo
 1. Done since the last scrum:
