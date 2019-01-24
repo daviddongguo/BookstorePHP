@@ -35,15 +35,16 @@
 
     <nav >
         <ul class="pagination">
-            {% if currentPage > 1 %}
+            {% if currentPage > 5 %}
                 <li class="page-item">
-                    <a class="page-link" href="/list/{{ currentPage -1 }}/{{ currentBookClass }}" aria-label="Previous">
+                    <a class="page-link" href="/list/{{ currentPage -5 }}/{{ currentBookClass }}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
+
                     </a>
                 </li>
             {% endif %}
 
-            {% for p in range(1, totalpages) %}
+            {% for p in range((currentPage < 6 ? 1 : currentPage), (totalpages < 6 ? totalpages : (currentPage < 6 ? 5: currentPage + 4) )) %}
                 {% if  p  == currentPage%}
                     <li class="page-item active" >
                         <a class="page-link" href="/list/{{ currentPage }}/{{ currentBookClass }}">{{ currentPage }}

@@ -14,7 +14,7 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
-//DB::debugMode();
+DB::debugMode();
 
 if (true) {
     DB::$user = 'bootstore';
@@ -69,11 +69,9 @@ $twig = $app->view()->getEnvironment();
 $twig->addGlobal('global_userId', $_SESSION['userId']);
 $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
-
-
 // <editor-fold desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
-    $pagesize = 5;
+    $pagesize = 3;
     $currentPage = 1;
     $bookClassCode = 'xxx';
     $offsetItmes = ($pagesize * ($currentPage - 1));
@@ -97,12 +95,9 @@ $app->get('/', function() use ($app, $log) {
     ));
 });
 // </editor-fold>
-
-
-
 // // <editor-fold  desc="Run '/list/:currentPage/:currentBookClass">
 $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $currentBookClass = 'xxx') use ($app, $log) {
-    $pagesize = 5;
+    $pagesize = 3;
 
     // Totalpages
     if ($currentBookClass == 'xxx') {  // for all book classes
@@ -200,26 +195,18 @@ $app->post('/login', function() use ($app, $log) {
     $email = $app->request()->post('email');
     $password = $app->request()->post('password');
     $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
-    
+
     if ($user && ($user['password'] == $password)) {
         $_SESSION['userId'] = $user['id'];              // login by userId
         $_SESSION['sessionId'] = session_id();          // and current sessionId
-        
         //$app->render('index.html.twig', array('userId' => $_SESSION['userId']));
-        
+
         $app->redirect('/');
-        
-        
     } else {
         $app->render('login.html.twig', array('error' => true));
     }
 });
 // </editor-fold> 
-
-
-
-
-
 // <editor-fold desc="Logout Page">
 $app->get('/logout', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -260,12 +247,6 @@ $app->get('/cart', function() use ($app, $log) {
     $app->render('cart.html.twig', array('cartitems' => $items));
 });
 // </editor-fold> 
-
-
-
-
-
-
 // <editor-fold desc="Transaction History Page">
 $app->get('/transactionhistory', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -285,32 +266,18 @@ $app->get('/transactionhistory', function() use ($app, $log) {
     }
 });
 // </editor-fold>
-
-
-
-
-
-
 // <editor-fold desc="Sell History Page">
-$app->get('/sellhistory', function() use ($app, $log) {  
-    
-    if ($_SESSION['userId'])
-    {
+$app->get('/sellhistory', function() use ($app, $log) {
+
+    if ($_SESSION['userId']) {
         $items = DB::query("SELECT * FROM items WHERE sellerId=%s", $_SESSION['userId']);
         $app->render('sellhistory.html.twig', array('items' => $items));
-    } 
-    else
-    {
+    } else {
         $log->addAlert('Unregistered user tried to Access SALES HISTORY');
         $app->redirect('/');
     }
 });
 // </editor-fold> 
-
-
-
-
-
 // <editor-fold desc="Sell Page (GET)">
 $app->get('/sell', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -321,11 +288,6 @@ $app->get('/sell', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
-
-
-
-
-
 // <editor-fold desc="Sell Page (POST)">
 $app->post('/sell', function() use ($app, $log) {
     $title = $app->request()->post('title');
@@ -366,8 +328,6 @@ $app->post('/sell', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
-
-
 // <editor-fold desc="Registration Page (GET)">
 $app->get('/register', function() use ($app, $log) {
 //  No Check on userId needed, if user is already 
@@ -375,71 +335,56 @@ $app->get('/register', function() use ($app, $log) {
     $app->render('register.html.twig');
 });
 // </editor-fold> 
-
-
 // <editor-fold desc="Registration Page (POST)">
 $app->post('/register', function() use ($app, $log) {
     $email = $app->request()->post('email');
     $password1 = $app->request()->post('password1');
     $password2 = $app->request()->post('password2');
     $values = array(
-        'email'=> $email, 
-        'password1' => $password1, 
+        'email' => $email,
+        'password1' => $password1,
         'password1' => $password2);
     $errorList = array();
-    
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL))
-    {
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         unset($values['email']);
         unset($values['password1']);
         unset($values['password2']);
         array_push($errorList, "The provided E-mail address is invalid");
-    }    
+    }
 
-    if (DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email))
-    {
+    if (DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email)) {
         unset($values['password1']);
         unset($values['password2']);
-        array_push($errorList, "This E-mail address is already in user");   
-    } 
-    
-    if (strlen($password1) < 6)
-    {
+        array_push($errorList, "This E-mail address is already in user");
+    }
+
+    if (strlen($password1) < 6) {
         unset($values['password1']);
         unset($values['password2']);
         array_push($errorList, "Passwords must be six characters or longer");
     }
-        
-    if ($password1 != $password2)
-    {
+
+    if ($password1 != $password2) {
         unset($values['password1']);
         unset($values['password2']);
         array_push($errorList, "Your passwords do not match");
-    }     
+    }
 
-    if (!$errorList) 
-    {
+    if (!$errorList) {
         DB::insert('users', array(
             'email' => $email,
             'password' => $password1
         ));
 
         $_SESSION['userId'] = DB::insertId();
-        
+
         $app->render('registration_successful.html.twig');
-    } 
-    else 
-    {
+    } else {
         $app->render('register.html.twig', array('errorList' => $errorList, 'values' => $values));
     }
 });
 // </editor-fold> 
-
-
-
-
-
-
 // <editor-fold desc="Run /cart/add/:id Page (POST)">
 $app->post('/cart/add/:itemId', function($itemId) use ($app, $log) {
 // validate parameters
@@ -449,11 +394,24 @@ $app->post('/cart/add/:itemId', function($itemId) use ($app, $log) {
         return;
     }
 
-    DB::insert('cartitems', array(
-        'itemId' => $itemId,
-        'userId' => $_SESSION['userId'],
-        'sessionId' => session_id()
-    ));
+    $sessionId = session_id();
+
+    if (!isset($_SESSION['userId'])) {
+        DB::insert('cartitems', array(
+            'userId' => '1',
+            'itemId' => $itemId,
+            'sessionId' => $sessionId
+        ));
+    } else {
+        $userId = $_SESSION['userId'];
+        DB::insert('cartitems', array(
+            'userId' => $userId,
+            'itemId' => $itemId,
+            'sessionId' => $sessionId
+        ));
+    }
+
+
     $id = DB::insertId();
     $cartItem = DB::queryFirstRow("SELECT * FROM cartitems WHERE id=%i", $id);
     $app->render('cart_add_success.html.twig', array(
