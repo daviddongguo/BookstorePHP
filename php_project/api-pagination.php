@@ -94,7 +94,8 @@ $app->get('/api/list/:currentPage/:currentBookClass',
     } else {                            // for special classes
         $booksList = DB::query("SELECT * FROM items "
                         . " WHERE DeweyDecimalClass LIKE %s"
-                        . " LIMIT $pagesize OFFSET $offsetItmes", substr($currentBookClass, 0, 1) . '%%');
+                        . " LIMIT $pagesize OFFSET $offsetItmes",
+                        substr($currentBookClass, 0, 1) . '%%');
     }
 
 

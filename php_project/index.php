@@ -96,19 +96,20 @@ $app->get('/', function() use ($app, $log) {
 });
 // </editor-fold>
 // // <editor-fold  desc="Run '/list/:currentPage/:currentBookClass">
-$app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $currentBookClass = 'xxx') use ($app, $log) {
+$app->get('/list/:currentPage/:currentBookClass',
+        function($currentPage = 1, $currentBookClass = 'xxx') use ($app, $log) {
     $pagesize = 3;
 
     // Totalpages
-    if ($currentBookClass == 'xxx') {  // for all book classes
+    if ($currentBookClass == 'xxx') {   // for all book classes
         DB::query("SELECT id FROM items");
-    } else {
+    } else {                            // for special classes
         DB::query("SELECT id FROM items "
                 . " WHERE DeweyDecimalClass LIKE %s"
                 . " ", substr($currentBookClass, 0, 1) . '%%');
     }
     $TotalItems = DB::count();
-    $totalpages = (int) (($TotalItems - 1) / $pagesize) + 1;
+    $totalpages = (int) (($TotalItems - 1) / $pagesize) + 1;    
     if ($currentPage > $totalpages) {
         $currentPage = $totalpages;
     }
@@ -615,7 +616,6 @@ $app->get('/item/:id/image', function($id) use ($app, $log) {
 // </editor-fold>
 // <editor-fold desc="Run /item/:code/class (GET)">
 $app->get('/item/:code/class', function($code) use ($app, $log) {
-
     switch (strlen($code)) {
         case 1:
             $codelikeStr = $code . '%0';
@@ -633,13 +633,10 @@ $app->get('/item/:code/class', function($code) use ($app, $log) {
             $results = DB::query($querStr);
             break;
     }
-//    var_dump($results);
-// <option value="{{ c.code }}">{{ c.name }}</option>
     $isFirstOption = true;
     foreach ($results as $row) {
         if ($isFirstOption) {
             $isFirstOption = false;
-//            echo "<option value='000' selected>Choose...</option>";
             echo "<option value='" . $row['code'] . "'>";
             echo $row['name'] . "</option>\n";
         } else {
