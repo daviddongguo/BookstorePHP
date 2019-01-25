@@ -14,7 +14,7 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
-DB::debugMode();
+DB::debugMode();            //Replace before submitting (SCOTT)
 
 if (true) {
     DB::$user = 'bootstore';
@@ -69,7 +69,7 @@ $twig = $app->view()->getEnvironment();
 $twig->addGlobal('global_userId', $_SESSION['userId']);
 $twig->addGlobal('global_sessionId', $_SESSION['sessionId']);
 // </editor-fold>
-// <editor-fold desc="Run Index Page (GET)">
+// <editor-fold defaultstate="collapsed" desc="Run Index Page (GET)">
 $app->get('/', function() use ($app, $log) {
     $pagesize = 3;
     $currentPage = 1;
@@ -95,7 +95,7 @@ $app->get('/', function() use ($app, $log) {
     ));
 });
 // </editor-fold>
-// // <editor-fold  desc="Run '/list/:currentPage/:currentBookClass">
+// // <editor-fold defaultstate="collapsed" desc="Run '/list/:currentPage/:currentBookClass">
 $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $currentBookClass = 'xxx') use ($app, $log) {
     $pagesize = 3;
 
@@ -110,7 +110,7 @@ $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $cu
     $TotalItems = DB::count();
     $totalpages = (int) (($TotalItems - 1) / $pagesize) + 1;
     if ($currentPage > $totalpages) {
-        $currentPage = $totalpages;
+        $currentPage = $totalpages;                         //Should this be $current = $totalpages - 1;
     }
 
     $offsetItmes = ($pagesize * ($currentPage - 1));
@@ -148,49 +148,46 @@ $app->get('/list/:currentPage/:currentBookClass', function($currentPage = 1, $cu
     ));
 });
 // </editor-fold>
-// <editor-fold desc="Index Page (with CRITERIA)">
-// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="Index Page (with CRITERIA)">
+    /*
+    $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
 
-/*
-  $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
-
-  $criteria1 = 'all',
-  $criteria2 = 'null',
-  $criteria3 = 'null') use ($app, $log) {
-  switch ($criteria1) {
-  case("all"): {
-  $books = DB::query("SELECT * FROM items");
-  }
-  case("new"): {
-  //Does nothing as the items have no timestamp
-  $books = DB::query("SELECT * FROM items");
-  }
-  case("below10"): {
-  $books = DB::query("SELECT * FROM items WHERE price < 10.00");
-  }
-  case("greater99"): {
-  $books = DB::query("SELECT * FROM items WHERE price > 99.99");
-  }
-  case("author"): {
-  $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
-  }
+    $criteria1 = 'all',
+    $criteria2 = 'null',
+    $criteria3 = 'null') use ($app, $log) {
+    switch ($criteria1) {
+    case("all"): {
+    $books = DB::query("SELECT * FROM items");
+    }
+    case("new"): {
+    //Does nothing as the items have no timestamp
+    $books = DB::query("SELECT * FROM items");
+    }
+    case("below10"): {
+    $books = DB::query("SELECT * FROM items WHERE price < 10.00");
+    }
+    case("greater99"): {
+    $books = DB::query("SELECT * FROM items WHERE price > 99.99");
+    }
+    case("author"): {
+    $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
+    }
 
 
-  //Need alot more...
-  }
-  $app->render('index.html.twig', array('books' => $books));
-  });
- */
-
-
-// <editor-fold desc="Login Page (GET)">
+    //Need alot more...
+    }
+    $app->render('index.html.twig', array('books' => $books));
+    });
+    */
+// </editor-fold> 
+// <editor-fold defaultstate="collapsed" desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
 //  No Check on userId needed, if user is already 
 //  logged in they can change accounts by logging in.
     $app->render('login.html.twig');
 });
 // </editor-fold> 
-// <editor-fold desc="Login Page (POST)">
+// <editor-fold defaultstate="collapsed" desc="Login Page (POST)">
 $app->post('/login', function() use ($app, $log) {
     $email = $app->request()->post('email');
     $password = $app->request()->post('password');
@@ -207,13 +204,14 @@ $app->post('/login', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
-// <editor-fold desc="Logout Page">
+// <editor-fold defaultstate="collapsed" desc="Logout Page">
 $app->get('/logout', function() use ($app, $log) {
     if ($_SESSION['userId']) {
         $_SESSION['userId'] = array();              // destroy userId
         $_SESSION['sessionId'] = array();           // and sessionId
         $app->render('logout.html.twig');
     } else {
+        $_SESSION['userId'] = array(); 
         $log->addAlert('Unregistered user tried to LOGOUT');
         $app->redirect('/');
     }
@@ -247,6 +245,7 @@ $app->get('/cart', function() use ($app, $log) {
     $app->render('cart.html.twig', array('cartitems' => $items));
 });
 // </editor-fold> 
+
 // <editor-fold desc="Transaction History Page">
 $app->get('/transactionhistory', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -256,9 +255,11 @@ $app->get('/transactionhistory', function() use ($app, $log) {
                         . "INNER JOIN orders "
                         . "ON orderitems.orderId=orders.id "
                         . "WHERE orders.userId=%s", $_SESSION['userId']);
+        
 //If we add a timestamp to the orders we can return the
 //transacrion history in chroniclogical order with
 //"ORDER BY orders.timestamp ASC"
+        
         $app->render('transactionhistory.html.twig', array('items' => $items));
     } else {
         $log->addAlert('Unregistered user tried to Access TRANSACTION HISTORY');
@@ -266,6 +267,7 @@ $app->get('/transactionhistory', function() use ($app, $log) {
     }
 });
 // </editor-fold>
+
 // <editor-fold desc="Sell History Page">
 $app->get('/sellhistory', function() use ($app, $log) {
 
@@ -278,6 +280,7 @@ $app->get('/sellhistory', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
+
 // <editor-fold desc="Sell Page (GET)">
 $app->get('/sell', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -328,6 +331,7 @@ $app->post('/sell', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
+
 // <editor-fold desc="Registration Page (GET)">
 $app->get('/register', function() use ($app, $log) {
 //  No Check on userId needed, if user is already 
@@ -335,6 +339,7 @@ $app->get('/register', function() use ($app, $log) {
     $app->render('register.html.twig');
 });
 // </editor-fold> 
+
 // <editor-fold desc="Registration Page (POST)">
 $app->post('/register', function() use ($app, $log) {
     $email = $app->request()->post('email');
