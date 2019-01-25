@@ -1,0 +1,93 @@
+{% extends "master.html.twig" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block sideNav %}
+    <h3>Side Nav</h3>  
+    {% if currentBookClass == 'xxx' %}
+        <a class="btn btn-outline-primary active" role="button" 
+           href="/"><small>All</small>
+        </a>
+    {% else %}
+        <a class="btn btn-outline-primary" role="button" 
+           href="/"><small>All</small>
+        </a>
+    {% endif %}
+    {% for item in DeweyDecimalClass %}
+
+        {% if currentBookClass == item.code %}
+            <a class="btn btn-outline-primary active" role="button" 
+               href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>
+            </a>
+        {% else %}
+            <a class="btn btn-outline-primary" role="button" 
+               href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>
+            </a>
+        {% endif %}
+
+    {% endfor %}        
+
+{% endblock %}
+
+{% block content %}
+
+    <nav >
+        <ul class="pagination">
+            {% if currentPage > 5 %}
+                <li class="page-item">
+                    <a class="page-link" href="/list/{{ currentPage -5 }}/{{ currentBookClass }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for p in range((currentPage < 6 ? 1 : currentPage), (totalpages < 6 ? totalpages : (currentPage < 6 ? 5: currentPage + 4) )) %}
+                {% if  p  == currentPage%}
+                    <li class="page-item active" >
+                        <a class="page-link" href="/list/{{ currentPage }}/{{ currentBookClass }}">{{ currentPage }}
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="/list/{{ p }}/{{ currentBookClass }}">{{ p }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {% if currentPage < totalpages -1 %}
+                <li class="page-item">
+                    <a class="page-link" href="/list/{{ currentPage +1 }}/{{ currentBookClass }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div>
+        {% for book in books %}
+            <div class="well">
+                {% if book.image != null %}
+                    <div class="pull-left" style="margin-right: 10px">
+                        <img class="img-thumbnail" width="75" height="75"
+                             src="/item/{{book.id}}/image" />
+                    </div>
+                {% endif %}
+                <h3>
+                    <strong><a href="/admin/item/edit/{{ book.id }}">{{book.title}}</a></strong>
+                    <span class="pull-right label label-primary">{{book.author}}</span>
+                    <span class="pull-right label label-primary">${{book.price}}</span>
+                </h3>
+                <form action='/cart/add/{{book.id}}' method='post' >
+                    <div class="pull-right">
+                        <input type="submit" class="btn btn-success" value="Add to cart" />
+                    </div>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock content %}
