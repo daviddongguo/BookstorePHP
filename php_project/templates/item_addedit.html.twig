@@ -91,16 +91,16 @@
             </div>
         </fieldset>
         <fieldset>
-            <legend class="col-form-label col-sm-4 pt-0"><label for="descriptionTextarea1">Image</label></legend>
+            <legend class="col-form-label col-sm-8 pt-0"><label for="descriptionTextarea1">Image</label></legend>
             <div class="form-group row">
                 <input type="file" name="image" onchange="loadFile(event)" 
-                       class=" col-sm-2 form-control-file" id="imageFormControlFile">
-                <img class="col-sm-4 rounded float-left" height="200" 
+                       class=" col-sm-8 form-control-file" id="imageFormControlFile">
+{#                <img class="col-sm-4 rounded float-left" height="200" hide
                      {% if v.id %}
                          src="/item/{{v.id}}/image"
                          id="preview" alt="The preview of an image of this book."
                      {% endif %}
-                     >
+                     >#}
 
             </div>
         </fieldset>

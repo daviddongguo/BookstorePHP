@@ -10,7 +10,6 @@
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">User Email</th>
                     <th scope="col">Book Title</th>
                     <th scope="col">Created Time</th>
                     <th scope="col">Edit</th>
@@ -21,7 +20,6 @@
                 {% for item in cartitems %}
                     <tr>
                         <th scope="row">{{item.id}}</th>
-                        <td>{{item.email}}</td>
                         <td>{{item.title}}</td>
                         <td>{{item.createdTS}}</td>
                         <td>

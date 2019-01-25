@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block sideNav %}
-    <h3>Side Nav</h3>  
+    <h3> <br /></h3>  
     {% if currentBookClass == 'xxx' %}
         <a class="btn btn-outline-primary active" role="button" 
            href="/"><small>All</small>
@@ -20,11 +20,11 @@
         {% if currentBookClass == item.code %}
             <a class="btn btn-outline-primary active" role="button" 
                href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>
-            </a>
+            </a><br>
         {% else %}
             <a class="btn btn-outline-primary" role="button" 
                href="/list/{{ currentPage }}/{{ item.code }}"><small>{{ item.name }}</small>
-            </a>
+            </a><br>
         {% endif %}
 
     {% endfor %}        
@@ -70,22 +70,34 @@
     <div>
         {% for book in books %}
             <div class="well">
-                {% if book.image != null %}
-                    <div class="pull-left" style="margin-right: 10px">
-                        <img class="img-thumbnail" width="75" height="75"
-                             src="/item/{{book.id}}/image" />
-                    </div>
-                {% endif %}
-                <h3>
-                    <strong><a href="/admin/item/edit/{{ book.id }}">{{book.title}}</a></strong>
-                    <span class="pull-right label label-primary">{{book.author}}</span>
-                    <span class="pull-right label label-primary">${{book.price}}</span>
-                </h3>
-                <form action='/cart/add/{{book.id}}' method='post' >
-                    <div class="pull-right">
-                        <input type="submit" class="btn btn-success" value="Add to cart" />
-                    </div>
-                </form>
+                <table>
+                    <tr>
+                        <td>
+                            {% if book.image != null %}
+                                <div class="pull-left" style="margin-right: 10px">
+                                    <img width="110" 
+                                         src="/item/{{book.id}}/image" />
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div>
+                                <strong><a href="/admin/item/edit/{{ book.id }}">{{book.title}}</a></strong>
+                                <span class="pull-right label label-primary">{{book.author}}</span>
+                                <span class="pull-right label label-primary">${{book.price}}</span>
+                            </div>
+                            <form action='/cart/add/{{book.id}}' method='post' >
+                                <div class="pull-right">
+                                    <input type="submit" class="btn btn-success" value="Add to cart" />
+                                </div>
+                            </form>
+
+                        </td>
+                    </tr>
+                </table>
+
+
+
             </div>
         {% endfor %}
     </div>
