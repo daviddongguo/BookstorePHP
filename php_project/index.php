@@ -17,7 +17,7 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 DB::debugMode();            //Replace before submitting (SCOTT)
 //DB::debugMode();
 
-if (true) {
+if (false) {
     DB::$user = 'bootstore';
     DB::$dbName = 'bootstore';
     DB::$password = 'vuxunjqTbm5S7sAq';
@@ -26,8 +26,8 @@ if (true) {
     DB::$encoding = 'utf8';
     DB::$error_handler = 'db_error_handler';
 } else {
-    DB::$user = 'bootstore';
-    DB::$dbName = 'bootstore';
+    DB::$user = 'cp4907_bookstore';
+    DB::$dbName = 'cp4907_scott-dongguo-bookstore.ipd15.com';
     DB::$password = 'vuxunjqTbm5S7sAq';
     DB::$port = 3306;
     DB::$host = 'localhost';
