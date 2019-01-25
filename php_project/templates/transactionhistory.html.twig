@@ -59,32 +59,23 @@
     
     {% if items %}    
         
-        {% for book in books %}
+        {% for book in items %}
           
 
+            <img width="190px" src="{{ book.image }}" alt="Book">
             
-            <div class="row">
-                <div class="col-sm-4">
-                    <div class="card">
-                        <img width="190px" src="{{ book.image }}" alt="Book">
-                    </div>
-                </div>
-
-                <div class="col-sm-6">
-                    <div>
+            <div>
                         <h3>{{ book.title }}</h3>
                         <h3>{{ book.author }}</h3>
                         <p>{{ book.description }}</p>
                         <p>{{ book.ISBN }}<p>
-                    </div>
-                </div>
-
-                <div style="font-size:20px" class="col-sm-4">
-                    <b >{{ book.price }}</b>
-                    <br><br>
-                    <b>no timestamp</b>
-                </div>
             </div>
+            <b style="font-size:20px">{{ book.price }}</b>
+
+            
+            
+            
+
             
         {% endfor %} 
     
