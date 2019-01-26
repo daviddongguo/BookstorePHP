@@ -109,7 +109,7 @@ $app->get('/list/:currentPage/:currentBookClass',
                 . " ", substr($currentBookClass, 0, 1) . '%%');
     }
     $TotalItems = DB::count();
-    $totalpages = (int) (($TotalItems - 1) / $pagesize) + 1;    
+    $totalpages = (int) (($TotalItems - 1) / $pagesize) + 1;
     if ($currentPage > $totalpages) {
         $currentPage = $totalpages;                         //Should this be $current = $totalpages - 1;
     }
@@ -150,36 +150,36 @@ $app->get('/list/:currentPage/:currentBookClass',
 });
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Index Page (with CRITERIA)">
-    /*
-    $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
+/*
+  $app->get('/scot/:criteria1/:criteria2/:criteria3', function(
 
-    $criteria1 = 'all',
-    $criteria2 = 'null',
-    $criteria3 = 'null') use ($app, $log) {
-    switch ($criteria1) {
-    case("all"): {
-    $books = DB::query("SELECT * FROM items");
-    }
-    case("new"): {
-    //Does nothing as the items have no timestamp
-    $books = DB::query("SELECT * FROM items");
-    }
-    case("below10"): {
-    $books = DB::query("SELECT * FROM items WHERE price < 10.00");
-    }
-    case("greater99"): {
-    $books = DB::query("SELECT * FROM items WHERE price > 99.99");
-    }
-    case("author"): {
-    $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
-    }
+  $criteria1 = 'all',
+  $criteria2 = 'null',
+  $criteria3 = 'null') use ($app, $log) {
+  switch ($criteria1) {
+  case("all"): {
+  $books = DB::query("SELECT * FROM items");
+  }
+  case("new"): {
+  //Does nothing as the items have no timestamp
+  $books = DB::query("SELECT * FROM items");
+  }
+  case("below10"): {
+  $books = DB::query("SELECT * FROM items WHERE price < 10.00");
+  }
+  case("greater99"): {
+  $books = DB::query("SELECT * FROM items WHERE price > 99.99");
+  }
+  case("author"): {
+  $books = DB::query("SELECT * FROM items WHERE author=%s", $criteria2);
+  }
 
 
-    //Need alot more...
-    }
-    $app->render('index.html.twig', array('books' => $books));
-    });
-    */
+  //Need alot more...
+  }
+  $app->render('index.html.twig', array('books' => $books));
+  });
+ */
 // </editor-fold> 
 // <editor-fold defaultstate="collapsed" desc="Login Page (GET)">
 $app->get('/login', function() use ($app, $log) {
@@ -213,7 +213,7 @@ $app->get('/logout', function() use ($app, $log) {
         $_SESSION['sessionId'] = array();           // and sessionId
         $app->render('logout.html.twig');
     } else {
-        $_SESSION['userId'] = array(); 
+        $_SESSION['userId'] = array();
         $log->addAlert('Unregistered user tried to LOGOUT');
         $app->redirect('/');
     }
@@ -247,7 +247,6 @@ $app->get('/cart', function() use ($app, $log) {
     $app->render('cart.html.twig', array('cartitems' => $items));
 });
 // </editor-fold> 
-
 // <editor-fold desc="Transaction History Page">
 $app->get('/transactionhistory', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -257,11 +256,11 @@ $app->get('/transactionhistory', function() use ($app, $log) {
                         . "INNER JOIN orders "
                         . "ON orderitems.orderId=orders.id "
                         . "WHERE orders.userId=%s", $_SESSION['userId']);
-        
+
 //If we add a timestamp to the orders we can return the
 //transacrion history in chroniclogical order with
 //"ORDER BY orders.timestamp ASC"
-        
+
         $app->render('transactionhistory.html.twig', array('items' => $items));
     } else {
         $log->addAlert('Unregistered user tried to Access TRANSACTION HISTORY');
@@ -269,7 +268,6 @@ $app->get('/transactionhistory', function() use ($app, $log) {
     }
 });
 // </editor-fold>
-
 // <editor-fold desc="Sell History Page">
 $app->get('/sellhistory', function() use ($app, $log) {
 
@@ -282,7 +280,6 @@ $app->get('/sellhistory', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
-
 // <editor-fold desc="Sell Page (GET)">
 $app->get('/sell', function() use ($app, $log) {
     if ($_SESSION['userId']) {
@@ -333,7 +330,6 @@ $app->post('/sell', function() use ($app, $log) {
     }
 });
 // </editor-fold> 
-
 // <editor-fold desc="Registration Page (GET)">
 $app->get('/register', function() use ($app, $log) {
 //  No Check on userId needed, if user is already 
@@ -341,7 +337,6 @@ $app->get('/register', function() use ($app, $log) {
     $app->render('register.html.twig');
 });
 // </editor-fold> 
-
 // <editor-fold desc="Registration Page (POST)">
 $app->post('/register', function() use ($app, $log) {
     $email = $app->request()->post('email');
@@ -455,6 +450,12 @@ $app->post('/cart/remove/:id', function($id) use ($app, $log) {
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Run /admin/item/add Page (GET POST)">
 $app->get('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $log) {
+    // only login user can continute 
+    if (!$_SESSION['userId']) {
+        $app->render('access_denied.html.twig');
+        return;
+    }
+
 // validate parameters
     if (($action == 'add' && $id != -1) || ($action == 'edit' && $id == -1)) {
         $app->notFound();
@@ -477,6 +478,11 @@ $app->get('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $l
     }
 });
 $app->post('/admin/item/:action(/:id)', function($action, $id = -1) use ($app, $log) {
+    // only login user can continute 
+    if (!$_SESSION['userId']) {
+        $app->render('access_denied.html.twig');
+        return;
+    }
     if (($action == 'add' && $id != -1) || ($action == 'edit' && $id == -1)) {
         $app->notFound();
         return;
@@ -698,6 +704,28 @@ $app->get('/isemailregistered/:email', function($email) use ($app, $log) {
 // <editor-fold defaultstate="collapsed" desc="Run /test (GET)">
 $app->get('/test', function() use ($app, $log) {
     var_dump($_SESSION);
+    echo '<hr>';
+    print_r($_SESSION);
+    echo '<hr>';
+    if (!isset($_SESSION['userId'])) {
+        echo 'isset works';
+    } else {
+        echo 'isset does\'t works';
+    }
+    echo '<hr>';
+    if (!$_SESSION['userId']) {
+        echo "session-userId is false";
+    } else {
+        echo 'session-userId does\'t works';
+    }
+
+    echo '<hr>';
+
+    if ($_SESSION['userId'] == '') {
+        echo "session-userId equals epmty string";
+    } else {
+        echo 'session-userId not equals epmty string';
+    }
 });
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="user-description">
