@@ -14,7 +14,8 @@ $log->pushHandler(new StreamHandler('logs/everything.log', Logger::DEBUG));
 $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
-DB::debugMode();            //Replace before submitting (SCOTT)
+// FIXME: Replace before submitting (SCOTT)
+//DB::debugMode();            //Replace before submitting (SCOTT)
 
 if (false) {
     DB::$user = 'bootstore';
