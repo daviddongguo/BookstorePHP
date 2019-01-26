@@ -8,13 +8,16 @@
     {% if error %}    
         <p class="error">Login credentials invalid<br>
             Try again or <a href="/register">register</a></p>
-    {% endif %}
-
+        {% endif %}
+    <ul>
+        <li>Default User: guest@g.u</li>
+        <li>Default password: 123asD</li>
+    </ul>
     <form method="post">
+
         Email:  <input type="email" name="email" value=""><br />
         password: <input type="password" name="password" value=""><br />
         <input type="submit" value="Login">
-        
     </form>
 
 {% endblock content %}

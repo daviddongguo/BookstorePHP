@@ -15,7 +15,6 @@ $log->pushHandler(new StreamHandler('logs/errors.log', Logger::ERROR));
 // </editor-fold>
 // <editor-fold defaultstate="collapsed" desc="Configure Database Connection">
 DB::debugMode();            //Replace before submitting (SCOTT)
-//DB::debugMode();
 
 if (false) {
     DB::$user = 'bootstore';
@@ -193,6 +192,7 @@ $app->get('/login', function() use ($app, $log) {
 $app->post('/login', function() use ($app, $log) {
     $email = $app->request()->post('email');
     $password = $app->request()->post('password');
+    $password = md5($password);
     $user = DB::queryFirstRow("SELECT * FROM users WHERE email=%s", $email);
 
     if ($user && ($user['password'] == $password)) {
@@ -379,9 +379,11 @@ $app->post('/register', function() use ($app, $log) {
     }
 
     if (!$errorList) {
+        $passwordMd5 = md5($password1);
+        echo '$passwordMd5';
         DB::insert('users', array(
             'email' => $email,
-            'password' => $password1
+            'password' => $passwordMd5
         ));
 
         $_SESSION['userId'] = DB::insertId();
